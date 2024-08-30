@@ -8,8 +8,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const matchFilePath = path.join(__dirname, "../match.json");
-console.log(matchFilePath, " ????");
-//const matchFilePath = path.join("../match.json");
 
 export function loadMatchFile() {
   const data = fs.readFileSync(matchFilePath, "utf8");
