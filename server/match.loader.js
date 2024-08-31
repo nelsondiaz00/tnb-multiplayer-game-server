@@ -15,6 +15,7 @@ export function loadMatchFile() {
 }
 
 export function saveMatchFile(matchData) {
+  // console.log("jaja");
   const data = JSON.stringify(matchData, null, 2);
   fs.writeFileSync(matchFilePath, data, "utf8");
 }
@@ -24,8 +25,19 @@ export function addPlayerToTeam(bindInfo) {
 
   const teamSide = bindInfo.teamSide;
   const team = matchData.teams[teamSide];
+  console.log("nose");
+  // Revisa si el ID ya existe en cualquier equipo
+  let idExists = false;
+  for (const side in matchData.teams) {
+    for (const player of matchData.teams[side].players) {
+      if (player.idUser === bindInfo.idUser) {
+        idExists = true;
+        break;
+      }
+    }
+  }
 
-  if (team) {
+  if (!idExists) {
     team.players.push({
       teamSide: bindInfo.teamSide,
       idUser: bindInfo.idUser,

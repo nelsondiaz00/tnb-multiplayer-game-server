@@ -13,7 +13,7 @@ import {
 import { circularList, startTurnRotation, callNextTurn } from "./turns.js";
 
 const port = process.env.PORT ?? 3000;
-
+//const users = [];
 const app = express();
 const server = createServer(app);
 //const io = new Server(server)
@@ -26,15 +26,17 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("a user has connected!", socket.id);
-
+  // if (!users.includes(socket.id)) {
   socket.on("bindInfo", (bindInfo) => {
-    console.log("Información recibida: ", bindInfo);
+    // console.log("Información recibida: ", bindInfo);
     addPlayerToTeam(bindInfo);
     const matchInfo = loadMatchFile();
     //saveMatchFile(matchInfo)
     console.log("match.json actualizado!");
     io.emit("newUser", matchInfo);
+    //users.push(socket.id);
   });
+  //}
 
   // recibe la notificacion del cliente que creo la partida que inicie la batalla
   socket.on("startBattle", (msg) => {
