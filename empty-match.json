@@ -1,12 +1,12 @@
 {
-    "idMatch": "1",
-    "teams": {
-      "blue": {
-        "players": [
-        ]}, 
-      "red": {
-        "players": [
-      ]
-      }
-  }
-  }
+  "idMatch": "1",
+  "teams": {
+    "blue": {
+      "players": [
+      ]}, 
+    "red": {
+      "players": [
+    ]
+    }
+}
+}
