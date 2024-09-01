@@ -2,30 +2,43 @@ import path from "path";
 import fs from "fs";
 import { GameSettings } from "./game.settings.js";
 import { fileURLToPath } from "url";
-import { console } from "inspector";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// import.meta.url generate errors of import modules
 
-const matchFilePath = path.join(__dirname, "../match.json");
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+const projectRoot = process.cwd();
 
+const matchFilePath = path.join(projectRoot, "match.json");
+
+// testing only
+// const __filename = process.argv[1];
+// const __dirname = path.dirname(__filename);
+//const matchFilePath = path.join(__dirname, "../match.json");
+
+// const matchFilePath = "../empty-match.json";
+
+//console.log(matchFilePath, " ???");
 export function loadMatchFile() {
   const data = fs.readFileSync(matchFilePath, "utf8");
   return JSON.parse(data);
 }
 
 export function saveMatchFile(matchData) {
-  // console.log("jaja");
+  //console.log(matchFilePath, " ???1");
   const data = JSON.stringify(matchData, null, 2);
+  //console.log(data, "jaja");
   fs.writeFileSync(matchFilePath, data, "utf8");
 }
 
 export function addPlayerToTeam(bindInfo) {
   const matchData = loadMatchFile();
-
   const teamSide = bindInfo.teamSide;
+  // console.log(bindInfo, " ???bind");
+  // console.log(typeof matchData, " mamatg");
+
   const team = matchData.teams[teamSide];
-  console.log("nose");
+  // console.log("nose");
   // Revisa si el ID ya existe en cualquier equipo
   let idExists = false;
   for (const side in matchData.teams) {
@@ -38,6 +51,7 @@ export function addPlayerToTeam(bindInfo) {
   }
 
   if (!idExists) {
+    console.log("El usuario ya está en el equipo.", teamSide);
     team.players.push({
       teamSide: bindInfo.teamSide,
       idUser: bindInfo.idUser,
@@ -48,9 +62,10 @@ export function addPlayerToTeam(bindInfo) {
       alive: bindInfo.alive,
     });
   } else {
-    console.error(`El equipo ${teamSide} no existe en el archivo match.json.`);
+    console.error(
+      `El usuario ${bindInfo.idUser} ya existe en el archivo match.json.`
+    );
   }
-
   saveMatchFile(matchData);
 }
 
@@ -90,7 +105,7 @@ export function affectSkills(idUser, idProduct) {
 
   let user = getPlayer(idUser, matchData);
 
-  console.log(user);
+  // console.log(user);
 
   const product = user.products.find(
     (product) => product.idProduct === idProduct
@@ -101,7 +116,7 @@ export function affectSkills(idUser, idProduct) {
     );
     return;
   }
-  console.log(product);
+  //  console.log(product);
 
   applyEffectsToPlayer(user, product, matchData);
 }
@@ -143,7 +158,7 @@ function applyEffectsToPlayer(player, product, matchData) {
 
 export function affectPlayerHealth(perpetratorId, victimId) {
   const matchData = loadMatchFile();
-  console.log("recibidos: " + perpetratorId + " - " + victimId);
+  // console.log("recibidos: " + perpetratorId + " - " + victimId);
   let perpetrator = getPlayer(perpetratorId, matchData);
   let victim = getPlayer(victimId, matchData);
 
@@ -162,7 +177,7 @@ export function affectPlayerHealth(perpetratorId, victimId) {
     const team = getTeam(perpetratorId, matchData);
     if (team.name == "red") GameSettings.addRedDead();
     else if (team.name == "blue") GameSettings.addBlueDead();
-    else console.error("??????Error al saber a donde pertenece el muerto");
+    // else console.error("??????Error al saber a donde pertenece el muerto");
 
     if (
       GameSettings.getRedDead == GameSettings.getRedPlayers ||

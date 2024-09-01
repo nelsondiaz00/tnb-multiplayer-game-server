@@ -2,12 +2,18 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const matchDataPath = path.join(__dirname, "../match.json");
+// const matchDataPath = path.join(__dirname, "../match.json");
+
+// only test
+
+const projectRoot = process.cwd();
+const matchDataPath = path.join(projectRoot, "match.json");
 
 //const matchFilePath = path.join("../match.json");
+// console.log("matchDataPath", " ahaya");
 let rotationStarted = false;
 const matchData = JSON.parse(fs.readFileSync(matchDataPath, "utf8"));
 let turnTimeout;
@@ -44,7 +50,7 @@ export function startTurnRotation(circularList, io) {
 
   const nextTurn = () => {
     const currentHero = circularList[index];
-    console.log(circularList, " lista");
+    console.log(" WTF????????ENTRÓOOOOOOO", currentHero);
     io.emit("turnInfo", { idUser: currentHero.idUser, side: currentHero.side });
     console.log(
       `Turno del héroe con ID: ${currentHero.idUser}, Lado: ${currentHero.side}`
