@@ -50,7 +50,6 @@ export function startTurnRotation(circularList, io) {
 
   const nextTurn = () => {
     const currentHero = circularList[index];
-    console.log(" WTF????????ENTRÓOOOOOOO", currentHero);
     io.emit("turnInfo", { idUser: currentHero.idUser, side: currentHero.side });
     console.log(
       `Turno del héroe con ID: ${currentHero.idUser}, Lado: ${currentHero.side}`

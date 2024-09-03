@@ -18,24 +18,19 @@ const matchFilePath = path.join(projectRoot, "match.json");
 
 // const matchFilePath = "../empty-match.json";
 
-//console.log(matchFilePath, " ???");
 export function loadMatchFile() {
   const data = fs.readFileSync(matchFilePath, "utf8");
   return JSON.parse(data);
 }
 
 export function saveMatchFile(matchData) {
-  //console.log(matchFilePath, " ???1");
   const data = JSON.stringify(matchData, null, 2);
-  //console.log(data, "jaja");
   fs.writeFileSync(matchFilePath, data, "utf8");
 }
 
 export function addPlayerToTeam(bindInfo) {
   const matchData = loadMatchFile();
   const teamSide = bindInfo.teamSide;
-  // console.log(bindInfo, " ???bind");
-  // console.log(typeof matchData, " mamatg");
 
   const team = matchData.teams[teamSide];
   // console.log("nose");
