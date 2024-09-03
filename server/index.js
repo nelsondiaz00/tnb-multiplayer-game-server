@@ -70,7 +70,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("getMatch", () => {
-    console.log("se pasó matchh");
+    console.log("se pasó match");
     io.emit("actualMatch", loadMatchFile()); // esto se usa solo pa enviar el match file cargado después de actualizar al usuario
   });
 

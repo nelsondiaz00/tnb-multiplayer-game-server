@@ -63,7 +63,6 @@ describe("saveMatchFile", () => {
     const data = JSON.stringify(mockData, null, 2);
 
     saveMatchFile(mockData);
-    // console.log(fs.writeFileSync);
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       expect.any(String),
       data,
@@ -90,7 +89,6 @@ describe("addPlayerToTeam", () => {
       teams: { red: { players: [] }, blue: { players: [] } },
     };
     fs.readFileSync.mockReturnValue(JSON.stringify(matchData));
-    // fs.writeFileSync.mockImplementation(() => {});
 
     const bindInfo = {
       teamSide: "red",
@@ -162,7 +160,7 @@ describe("affectSkills", () => {
             {
               ...matchData.teams.red.players[0],
               attributes: {
-                strength: { value: 15 }, // Valor actualizado después de aplicar el efecto
+                strength: { value: 15 },
               },
             },
           ],
@@ -229,7 +227,7 @@ describe("affectPlayerHealth", () => {
             {
               ...matchData.teams.blue.players[0],
               attributes: {
-                blood: { value: 30 }, // Valor actualizado después de recibir daño
+                blood: { value: 30 }, 
               },
             },
           ],
@@ -294,9 +292,9 @@ describe("affectPlayerHealth", () => {
             {
               ...matchData.teams.blue.players[0],
               attributes: {
-                blood: { value: 0 }, // Sangre reducida a 0
+                blood: { value: 0 }, 
               },
-              alive: false, // Estado de vida cambiado a false
+              alive: false, 
             },
           ],
         },
