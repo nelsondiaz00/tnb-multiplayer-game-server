@@ -19,7 +19,7 @@ export class Product implements IProduct {
     public effects: IEffect[];
     public conditions: ICondition[];
     public imagePath: string;
-    public powerCost: string;
+    public powerCost: number;
 
     constructor(
         idProduct: string,
@@ -32,7 +32,7 @@ export class Product implements IProduct {
         effects: IEffect[],
         conditions: ICondition[],
         imagePath: string,
-        powerCost: string
+        powerCost: number
     ) {
         this.idProduct = idProduct;
         this.productType = productType;

@@ -4,6 +4,7 @@ import { subHeroType } from "../types/hero.type";
 import { IHero } from "../interfaces/hero.interfaces";
 import { IAttribute } from "../interfaces/attribute.interfaces";
 import { IProduct } from "../interfaces/product.interfaces";
+import { teamSide } from "../types/team.type";
 
 export class Hero implements IHero {
     public idUser: string;
@@ -12,6 +13,7 @@ export class Hero implements IHero {
     public attributes: { [key: string]: IAttribute };
     public products: IProduct[];
     public alive: boolean;
+    public teamSide: teamSide;
 
     constructor(
         idUser: string,
@@ -19,6 +21,7 @@ export class Hero implements IHero {
         subtype: subHeroType,
         attributesArray: IAttribute[],
         products: IProduct[],
+        teamSide: teamSide
     ) { 
         this.idUser = idUser;
         this.type = type;
@@ -28,6 +31,7 @@ export class Hero implements IHero {
         );
         this.products = products;
         this.alive = true;
+        this.teamSide = teamSide;
     }
 
     isNull(): boolean { return false; }

@@ -5,6 +5,7 @@ import { Turn } from "../models/turn.model";
 import { ITurn } from "../interfaces/turn.interface";
 import { TurnNotifier } from "../utils/turn.notifier";
 import logger from "../utils/logger";
+import { IMatchLoader } from "../interfaces/match.loader.interface";
 
 const TURN_DURATION_MS = 5000;
 
@@ -15,9 +16,11 @@ export class Turns implements ITurns {
     private nextTurnFunction!: () => void;
     private circularList: ITurn[] = [];
     private turnNotifier: TurnNotifier;
+    private matchLoader: IMatchLoader;
 
-    constructor(io: Server) {
+    constructor(io: Server, matchLoader: IMatchLoader) {
         this.turnNotifier = new TurnNotifier(io);
+        this.matchLoader = matchLoader;
     }
 
     private updateCircularList(matchInfo: IMatch) {
@@ -29,9 +32,7 @@ export class Turns implements ITurns {
 
         const redTeam = matchInfo.teams.get("red");
         if (redTeam == undefined) {
-            logger.error(
-                "Looks like redTeam does not exist, you are really good at this arent u."
-            );
+            logger.error("Looks like redTeam does not exist, you are really good at this arent u.");
             return;
         }
 
@@ -58,6 +59,7 @@ export class Turns implements ITurns {
         const nextTurn = () => {
             const currentUser = this.circularList[index];
             this.turnNotifier.notifyTurn(currentUser);
+            this.matchLoader.givePower(currentUser.idUser);
 
             index = (index + 1) % this.circularList.length;
 
@@ -77,9 +79,6 @@ export class Turns implements ITurns {
 
     callNextTurn(): void {
         if (this.rotationStarted) this.nextTurnFunction();
-        else
-            logger.info(
-                "Take it easy man, the rotation has to be started yet."
-            );
+        else logger.info("Take it easy man, the rotation has to be started yet.");
     }
 }

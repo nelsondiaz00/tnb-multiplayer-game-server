@@ -16,7 +16,7 @@ export interface IProduct {
     effects: IEffect[];
     conditions: ICondition[];
     imagePath: string;
-    powerCost: string;
+    powerCost: number;
 
     useProduct(target: IHero): { [key: string]: IAttribute };
     isNull(): boolean;

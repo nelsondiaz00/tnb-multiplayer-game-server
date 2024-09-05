@@ -1,4 +1,5 @@
 import winston from 'winston';
+import { threadId } from 'worker_threads';
 
 const logger = winston.createLogger({
   level: 'info',
@@ -6,7 +7,8 @@ const logger = winston.createLogger({
     winston.format.colorize(),
     winston.format.timestamp(),
     winston.format.printf(({ timestamp, level, message }) => {
-      return `${timestamp} [${level}]: ${message}`;
+      const threadInfo = threadId ? ` (Thread: ${threadId})` : '';
+      return `${timestamp} [${level}]${threadInfo}: ${message}`;
     })
   ),
   transports: [
