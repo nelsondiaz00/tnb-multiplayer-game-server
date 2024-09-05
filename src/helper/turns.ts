@@ -6,13 +6,13 @@ import { ITurn } from "../interfaces/turn.interface";
 import { TurnNotifier } from "../utils/turn.notifier";
 import logger from "../utils/logger";
 
-const TURN_DURATION_MS = 30000;
+const TURN_DURATION_MS = 5000;
 
 export class Turns implements ITurns {
     private rotationStarted: boolean = false;
     private turnTimeout!: NodeJS.Timeout;
     // = setTimeout(() => {}, 0)
-    private nextTurnFunction!: (() => void);
+    private nextTurnFunction!: () => void;
     private circularList: ITurn[] = [];
     private turnNotifier: TurnNotifier;
 
@@ -21,29 +21,31 @@ export class Turns implements ITurns {
     }
 
     private updateCircularList(matchInfo: IMatch) {
-        const blueTeam = matchInfo.teams.get('blue')
+        const blueTeam = matchInfo.teams.get("blue");
         if (blueTeam == undefined) {
-            logger.error("Looks like blueTeam does not exist:)")
+            logger.error("Looks like blueTeam does not exist:)");
             return;
         }
 
-        const redTeam = matchInfo.teams.get('red');
+        const redTeam = matchInfo.teams.get("red");
         if (redTeam == undefined) {
-            logger.error("Looks like redTeam does not exist, you are really good at this arent u.");
+            logger.error(
+                "Looks like redTeam does not exist, you are really good at this arent u."
+            );
             return;
         }
 
         const bluePlayers = blueTeam.players;
         const redPlayers = redTeam.players;
 
-        const maxLength = Math.max(bluePlayers.length, redPlayers.length)
+        const maxLength = Math.max(bluePlayers.length, redPlayers.length);
 
         for (let i = 0; i < maxLength; i++) {
             if (i < bluePlayers.length)
-                this.circularList.push( new Turn('blue', bluePlayers[i].idUser));
+                this.circularList.push(new Turn("blue", bluePlayers[i].idUser));
 
             if (i < redPlayers.length)
-                this.circularList.push( new Turn('red', redPlayers[i].idUser))
+                this.circularList.push(new Turn("red", redPlayers[i].idUser));
         }
     }
 
@@ -68,13 +70,16 @@ export class Turns implements ITurns {
         this.nextTurnFunction = () => {
             clearTimeout(this.turnTimeout);
             nextTurn();
-        }
+        };
 
         this.rotationStarted = true;
     }
 
     callNextTurn(): void {
         if (this.rotationStarted) this.nextTurnFunction();
-        else logger.info("Take it easy man, the rotation has to be started yet.")
+        else
+            logger.info(
+                "Take it easy man, the rotation has to be started yet."
+            );
     }
 }

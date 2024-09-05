@@ -19,6 +19,7 @@ export class Product implements IProduct {
     public effects: IEffect[];
     public conditions: ICondition[];
     public imagePath: string;
+    public powerCost: string;
 
     constructor(
         idProduct: string,
@@ -31,6 +32,7 @@ export class Product implements IProduct {
         effects: IEffect[],
         conditions: ICondition[],
         imagePath: string,
+        powerCost: string
     ) {
         this.idProduct = idProduct;
         this.productType = productType;
@@ -42,6 +44,7 @@ export class Product implements IProduct {
         this.effects = effects;
         this.conditions = conditions;
         this.imagePath = imagePath;
+        this.powerCost = powerCost;
     }
 
     useProduct(target: IHero): { [key: string]: IAttribute } {
@@ -63,5 +66,7 @@ export class Product implements IProduct {
         return attributesCopy;
     }
 
-    isNull(): boolean { return false; }
+    isNull(): boolean {
+        return false;
+    }
 }

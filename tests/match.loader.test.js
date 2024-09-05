@@ -1,134 +1,311 @@
-import fs from "fs";
 import path from "path";
-import { GameSettings } from "../server/game.settings.js";
+import fs from "fs";
+import { GameSettings } from "../server/game.settings";
+import { fileURLToPath } from "url";
 import {
   loadMatchFile,
   saveMatchFile,
   addPlayerToTeam,
   affectSkills,
   affectPlayerHealth,
-} from "../server/match.loader.js";
+} from "../server/match.loader";
 
 jest.mock("fs");
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+test("should a match file from a json file and correct arguments", () => {
+  const mockData = JSON.stringify({
+    idMatch: "1",
+    teams: {
+      blue: {
+        players: [],
+      },
+      red: {
+        players: [],
+      },
+    },
+  });
+  fs.readFileSync.mockReturnValue(mockData);
+  const result = loadMatchFile();
 
-const mockMatchFilePath = path.join("../match.json");
+  expect(result).toEqual({
+    idMatch: "1",
+    teams: {
+      blue: {
+        players: [],
+      },
+      red: {
+        players: [],
+      },
+    },
+  });
 
-describe("Game Functions Tests", () => {
+  expect(fs.readFileSync).toHaveBeenCalledWith(expect.any(String), "utf8");
+});
+
+describe("saveMatchFile", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    GameSettings.bluePlayers = 0;
-    GameSettings.redPlayers = 0;
-    GameSettings.blueDead = 0;
-    GameSettings.redDead = 0;
+    jest.clearAllMocks();
   });
 
-  test("loadMatchFile should return parsed JSON data", () => {
-    const mockData = { teams: {} };
-    fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
-
-    const result = loadMatchFile();
-    expect(result).toEqual(mockData);
+  const mockData = JSON.stringify({
+    idMatch: "1",
+    teams: {
+      blue: {
+        players: [],
+      },
+      red: {
+        players: [],
+      },
+    },
   });
 
-  test("saveMatchFile should write JSON data to file", () => {
-    const mockData = { teams: { blue: { players: [] } } };
+  it("should save match data to a file", () => {
+    const data = JSON.stringify(mockData, null, 2);
+
     saveMatchFile(mockData);
-
     expect(fs.writeFileSync).toHaveBeenCalledWith(
-      mockMatchFilePath,
-      JSON.stringify(mockData, null, 2),
+      expect.any(String),
+      data,
       "utf8"
     );
   });
 
-  // test("addPlayerToTeam should add player to the correct team", () => {
-  //   const playerInfo = {
-  //     teamSide: "blue",
-  //     idUser: "1",
-  //     type: "warrior",
-  //     subtype: "knight",
-  //     attributes: {},
-  //     products: [],
-  //   };
-  //   console.log(
-  //     playerInfo,
-  //     " ME UI SFUSHDAKJHSFKHSJF,SDLJKLSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSJDSKFH"
-  //   );
+  it("should stringify match data with correct formatting", () => {
+    saveMatchFile(mockData);
 
-  //   const updatedData = addPlayerToTeam(playerInfo);
-  //   expect(updatedData.teams.blue.players).toContainEqual(playerInfo);
-  // });
+    const jsonString = JSON.stringify(mockData, null, 2);
 
-  // test("affectSkills should apply product effects to player attributes", () => {
-  //   const mockData = {
-  //     teams: {
-  //       blue: {
-  //         players: [
-  //           {
-  //             idUser: "1",
-  //             attributes: {
-  //               health: {
-  //                 name: "health",
-  //                 value: 10,
-  //                 valueMin: 0,
-  //                 valueMax: 0,
-  //               },
-  //             },
-  //             products: [
-  //               {
-  //                 idProduct: "p1",
-  //                 effects: [
-  //                   {
-  //                     attributeName: "health",
-  //                     mathOperator: "+",
-  //                     turns: 0,
-  //                     target: "ally",
-  //                     value: 5,
-  //                     valueCaused: 5,
-  //                   },
-  //                 ],
-  //               },
-  //             ],
-  //           },
-  //         ],
-  //       },
-  //     },
-  //   };
-  //   fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.any(String),
+      jsonString,
+      "utf8"
+    );
+  });
+});
 
-  //   affectSkills("1", "p1");
-  //   // const updatedData = JSON.parse(fs.readFileSync.mock.results[0].value);
+describe("addPlayerToTeam", () => {
+  it("should add a player to the team if the player does not already exist", () => {
+    const matchData = {
+      teams: { red: { players: [] }, blue: { players: [] } },
+    };
+    fs.readFileSync.mockReturnValue(JSON.stringify(matchData));
 
-  //   expect(match.teams.blue.players[0].attributes.health.value).toBe(15);
-  // });
+    const bindInfo = {
+      teamSide: "red",
+      idUser: "1",
+      type: "warrior",
+      subtype: "weapon",
+      attributes: {},
+      products: [],
+      alive: false,
+    };
+    addPlayerToTeam(bindInfo);
+    const updatedMatchData = {
+      ...matchData,
+      teams: {
+        ...matchData.teams,
+        red: { players: [bindInfo] },
+      },
+    };
 
-  //   test("affectPlayerHealth should update health and handle death", () => {
-  //     GameSettings.setBluePlayers(1);
-  //     GameSettings.setRedPlayers(1);
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.any(String),
+      JSON.stringify(updatedMatchData, null, 2),
+      "utf8"
+    );
 
-  //     const mockData = {
-  //       teams: {
-  //         blue: {
-  //           players: [
-  //             { idUser: "1", attributes: { health: { value: 10 } }, alive: true },
-  //           ],
-  //         },
-  //         red: {
-  //           players: [
-  //             { idUser: "2", attributes: { damage: { value: 5 } }, alive: true },
-  //           ],
-  //         },
-  //       },
-  //     };
-  //     fs.readFileSync.mockReturnValue(JSON.stringify(mockData));
+    expect(updatedMatchData.teams.red.players).toContainEqual(bindInfo);
+  });
+});
 
-  //     affectPlayerHealth("2", "1");
-  //     const updatedData = JSON.parse(fs.readFileSync.mock.results[0].value);
+describe("affectSkills", () => {
+  it("should apply product effects to the player's attributes", () => {
+    const matchData = {
+      teams: {
+        red: {
+          players: [
+            {
+              teamSide: "red",
+              idUser: "1",
+              type: "warrior",
+              subtype: "weapon",
+              attributes: {
+                strength: { value: 10 },
+              },
+              products: [
+                {
+                  idProduct: "prod1",
+                  effects: [
+                    { attributeName: "strength", mathOperator: "+", value: 5 },
+                  ],
+                },
+              ],
+              alive: true,
+            },
+          ],
+        },
+      },
+    };
 
-  //     expect(updatedData.teams.blue.players[0].attributes.health.value).toBe(5);
-  //     expect(GameSettings.getBlueDead()).toBe(0);
-  //     expect(GameSettings.getRedDead()).toBe(1);
+    fs.readFileSync.mockReturnValue(JSON.stringify(matchData));
+
+    affectSkills("1", "prod1");
+
+    const updatedMatchData = {
+      ...matchData,
+      teams: {
+        ...matchData.teams,
+        red: {
+          players: [
+            {
+              ...matchData.teams.red.players[0],
+              attributes: {
+                strength: { value: 15 },
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.any(String),
+      JSON.stringify(updatedMatchData, null, 2),
+      "utf8"
+    );
+  });
+});
+
+describe("affectPlayerHealth", () => {
+  it("should reduce the victim's blood by the perpetrator's damage", () => {
+    const matchData = {
+      teams: {
+        red: {
+          players: [
+            {
+              teamSide: "red",
+              idUser: "1",
+              type: "warrior",
+              subtype: "weapon",
+              attributes: {
+                damage: { value: 10 },
+                blood: { value: 50 },
+              },
+              products: [],
+              alive: true,
+            },
+          ],
+        },
+        blue: {
+          players: [
+            {
+              teamSide: "blue",
+              idUser: "2",
+              type: "warrior",
+              subtype: "weapon",
+              attributes: {
+                blood: { value: 40 },
+              },
+              products: [],
+              alive: true,
+            },
+          ],
+        },
+      },
+    };
+
+    fs.readFileSync.mockReturnValue(JSON.stringify(matchData));
+
+    affectPlayerHealth("1", "2");
+
+    const updatedMatchData = {
+      ...matchData,
+      teams: {
+        ...matchData.teams,
+        blue: {
+          players: [
+            {
+              ...matchData.teams.blue.players[0],
+              attributes: {
+                blood: { value: 30 }, 
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.any(String),
+      JSON.stringify(updatedMatchData, null, 2),
+      "utf8"
+    );
+  });
+
+  it("should set victim's alive to false if blood drops to 0", () => {
+    const matchData = {
+      teams: {
+        red: {
+          players: [
+            {
+              teamSide: "red",
+              idUser: "1",
+              type: "warrior",
+              subtype: "weapon",
+              attributes: {
+                damage: { value: 50 },
+                blood: { value: 50 },
+              },
+              products: [],
+              alive: true,
+            },
+          ],
+        },
+        blue: {
+          players: [
+            {
+              teamSide: "blue",
+              idUser: "2",
+              type: "warrior",
+              subtype: "weapon",
+              attributes: {
+                blood: { value: 40 },
+              },
+              products: [],
+              alive: true,
+            },
+          ],
+        },
+      },
+    };
+
+    fs.readFileSync.mockReturnValue(JSON.stringify(matchData));
+
+    affectPlayerHealth("1", "2");
+
+    const updatedMatchData = {
+      ...matchData,
+      teams: {
+        ...matchData.teams,
+        blue: {
+          players: [
+            {
+              ...matchData.teams.blue.players[0],
+              attributes: {
+                blood: { value: 0 }, 
+              },
+              alive: false, 
+            },
+          ],
+        },
+      },
+    };
+
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.any(String),
+      JSON.stringify(updatedMatchData, null, 2),
+      "utf8"
+    );
+  });
+
 });

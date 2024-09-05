@@ -2,7 +2,6 @@ import { GameSettings } from "../server/game.settings.js";
 
 describe("GameSettings", () => {
   beforeEach(() => {
-    // Reset the static variables before each test
     GameSettings.bluePlayers = 0;
     GameSettings.redPlayers = 0;
     GameSettings.blueDead = 0;
