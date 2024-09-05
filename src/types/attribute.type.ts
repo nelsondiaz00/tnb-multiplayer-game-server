@@ -1,0 +1,1 @@
+export type attributeName = 'force' | 'health' | 'attack' | 'damage' | 'critical' | 'defense' | 'level' | 'experience'; 
