@@ -10,9 +10,15 @@ import { Team } from "../models/team.model";
 import { NullHero } from "../null_models/null.hero";
 import { NullProduct } from "../null_models/null.product";
 import { NullTeam } from "../null_models/null.team";
-import { AdditionStrategy, EffectStrategy, MultiplicationStrategy, SubtractionStrategy } from "../utils/operator.strategy";
+import {
+    AdditionStrategy,
+    EffectStrategy,
+    MultiplicationStrategy,
+    SubtractionStrategy,
+} from "../utils/operator.strategy";
 import { teamSide } from "../types/team.type";
 import logger from "../utils/logger";
+import { GameSettings } from "../utils/game.settings";
 
 export class MatchLoader implements IMatchLoader {
     private match: IMatch;
@@ -25,16 +31,16 @@ export class MatchLoader implements IMatchLoader {
     private productMap: Map<string, IProduct>;
 
     constructor() {
-        this.blueTeam = new Team([], 'blue', true);
-        this.redTeam = new Team([], 'red', true);
+        this.blueTeam = new Team([], "blue", true);
+        this.redTeam = new Team([], "red", true);
 
         this.teams = new Map<teamSide, ITeam>();
-        this.teams.set('blue', this.blueTeam);
-        this.teams.set('red', this.redTeam);
+        this.teams.set("blue", this.blueTeam);
+        this.teams.set("red", this.redTeam);
 
         this.match = new Match("TODO", this.teams);
 
-        this.heroMap  = new Map();
+        this.heroMap = new Map();
         this.productMap = new Map();
     }
 
@@ -44,26 +50,34 @@ export class MatchLoader implements IMatchLoader {
             return;
         }
 
-        if (bindInfo.teamSide == 'blue') this.blueTeam.addHero(bindInfo.hero);
-        else if (bindInfo.teamSide == 'red') this.redTeam.addHero(bindInfo.hero);
+        if (bindInfo.teamSide == "blue") this.blueTeam.addHero(bindInfo.hero);
+        else if (bindInfo.teamSide == "red")
+            this.redTeam.addHero(bindInfo.hero);
 
         this.heroMap.set(bindInfo.hero.idUser, bindInfo.hero);
 
         bindInfo.hero.products.forEach((product) => {
-            if (this.productMap.get(product.idProduct) == undefined) this.productMap.set(product.idProduct, product);
-        })
+            if (this.productMap.get(product.idProduct) == undefined)
+                this.productMap.set(product.idProduct, product);
+        });
     }
 
-    affectSkills(perpetratorId: string, productId: string, victimId: string): void {
+    affectSkills(
+        perpetratorId: string,
+        productId: string,
+        victimId: string
+    ): void {
         const product: IProduct = this.getProduct(productId);
-        if (product.isNull()) {
+        if (product === null) {
             logger.error("the product is null, guess that shouldnt happen");
             return;
         }
 
         const perpetratorSide: ITeam = this.getTeam(perpetratorId);
         if (perpetratorSide.isNull()) {
-            logger.error("the perpetrator team is null, guess that shouldnt happen");
+            logger.error(
+                "the perpetrator team is null, guess that shouldnt happen"
+            );
             return;
         }
 
@@ -73,8 +87,8 @@ export class MatchLoader implements IMatchLoader {
             return;
         }
 
-        const effectTarget = (effect: IEffect) => 
-            effect.target === 'ally' ? perpetratorSide : victimSide;
+        const effectTarget = (effect: IEffect) =>
+            effect.target === "ally" ? perpetratorSide : victimSide;
 
         product.effects.forEach((effect) => {
             this.affectTeam(effectTarget(effect), effect);
@@ -85,28 +99,50 @@ export class MatchLoader implements IMatchLoader {
         const perpetrator: IHero = this.getHero(perpetratorId);
         const victim: IHero = this.getHero(victimId);
 
-        if (perpetrator.isNull() || victim.isNull()) {
-            logger.error("the perpetrator or the victim, someone is null, wtf is this code man.");
+        // console.log(
+        //     perpetrator,
+        //     " PERPEPERPEPERPEPERPEPERPEPERPEPERPEPERPEPERPE"
+        // );
+        // console.log(victim, " VICTIMAVICTIMAVICTIMAVICTIMAVICTIMAVICTIMA");
+
+        if (perpetrator === null || victim === null) {
+            logger.error(
+                "the perpetrator or the victim, someone is null, wtf is this code man."
+            );
             return;
         }
 
-        if (perpetrator.attributes['attack'].value < victim.attributes['defense'].value) return;
-
-        if (victim.attributes['blood'].value - perpetrator.attributes['attack'].value > 0) {
-            victim.attributes['blood'].value -= perpetrator.attributes['attack'].value;
+        if (
+            perpetrator.attributes["attack"].value <
+            victim.attributes["defense"].value
+        ) {
+            logger.info("victim is so tanky, no damage taken");
+            return;
+        }
+        if (
+            victim.attributes["blood"].value -
+                perpetrator.attributes["attack"].value >
+            0
+        ) {
+            logger.info("perpetrator hits!, victim still alive");
+            victim.attributes["blood"].value -=
+                perpetrator.attributes["attack"].value;
             return;
         }
 
-        victim.attributes['blood'].value = 0;
+        victim.attributes["blood"].value = 0;
         victim.alive = false;
 
         const victimTeam = this.getTeam(victimId);
         if (victimTeam.isNull()) {
-            logger.error("victimTeam null :))))"); return;
+            logger.error("victimTeam null :))))");
+            return;
         }
 
-        victimTeam.teamSide === 'blue' ? GameSettings.addBlueDead() : GameSettings.addRedDead();
-
+        victimTeam.teamSide === "blue"
+            ? GameSettings.addBlueDead()
+            : GameSettings.addRedDead();
+        // console.log(GameSettings.blueAlive, " -- ", GameSettings.redAlive);
         if (!GameSettings.blueAlive || !GameSettings.redAlive) {
             victimTeam.alive = false;
             //endMatch()?
@@ -123,14 +159,13 @@ export class MatchLoader implements IMatchLoader {
     }
 
     private getTeam(idHero: string): ITeam {
-        const firstSide = this.teams.get('blue');
+        const firstSide = this.teams.get("blue");
         if (firstSide == null) return new NullTeam();
 
         for (const player of firstSide.players)
             if (player.idUser == idHero) return firstSide;
 
-
-        const secondSide = this.teams.get('red');
+        const secondSide = this.teams.get("red");
         if (secondSide == null) return new NullTeam();
 
         for (const player of secondSide.players)
@@ -139,23 +174,33 @@ export class MatchLoader implements IMatchLoader {
         return new NullTeam();
     }
 
-    getMatch(): IMatch { return this.match; }
+    getMatch(): IMatch {
+        return this.match;
+    }
 
     private affectTeam(side: ITeam, effect: IEffect): void {
         const strategy: EffectStrategy = this.getStrategy(effect.mathOperator);
 
         side.players.forEach((player) => {
-            player.attributes[effect.attribute.name].value = 
-                strategy.applyEffect(player.attributes[effect.attribute.name].value, effect.value);
-        })
+            //  console.log(effect, " playerplayerplayerplayerplayerplayer");
+            player.attributes[effect.attribute.name].value =
+                strategy.applyEffect(
+                    player.attributes[effect.attribute.name].value,
+                    effect.value
+                );
+        });
     }
 
     private getStrategy(operator: string): EffectStrategy {
-        switch(operator) {
-            case '+': return new AdditionStrategy();
-            case '-': return new SubtractionStrategy();
-            case '*': return new MultiplicationStrategy();
-            default: throw new Error('Unsupported operator');
+        switch (operator) {
+            case "+":
+                return new AdditionStrategy();
+            case "-":
+                return new SubtractionStrategy();
+            case "*":
+                return new MultiplicationStrategy();
+            default:
+                throw new Error("Unsupported operator");
         }
     }
 }

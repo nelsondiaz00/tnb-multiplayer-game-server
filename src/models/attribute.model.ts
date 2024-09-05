@@ -11,7 +11,7 @@ export class Attribute implements IAttribute {
         name: attributeName,
         value: number,
         valueMin: number,
-        valueMax: number,
+        valueMax: number
     ) {
         this.name = name;
         this.valueConstant = value;
@@ -38,7 +38,7 @@ export class Attribute implements IAttribute {
             this.name,
             this.value,
             this.valueMin,
-            this.valueMax,
+            this.valueMax
         );
     }
 
@@ -51,7 +51,7 @@ export class Attribute implements IAttribute {
             this.value +
             Math.floor(
                 Math.random() * (this.valueMax - this.valueMin + 1) +
-                    this.valueMin,
+                    this.valueMin
             )
         );
     }

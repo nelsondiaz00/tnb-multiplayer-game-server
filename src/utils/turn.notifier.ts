@@ -11,6 +11,8 @@ export class TurnNotifier {
 
     notifyTurn(turn: ITurn): void {
         this.io.emit("turnInfo", turn);
-        logger.info(`Turno del héroe con ID: ${turn.idUser}, Side: ${turn.side}`);
+        logger.info(
+            `Turno del héroe con ID: ${turn.idUser}, Side: ${turn.side}`
+        );
     }
 }
