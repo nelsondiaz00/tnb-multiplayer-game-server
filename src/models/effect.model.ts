@@ -1,6 +1,6 @@
-import { Attribute } from "./attribute.model";
-import { targetType } from "../types/effect.type";
-import { IEffect } from "../interfaces/effect.interfaces";
+import { Attribute } from "./attribute.model.js";
+import { targetType } from "../types/effect.type.js";
+import { IEffect } from "../interfaces/effect.interfaces.js";
 
 export class Effect implements IEffect {
     public attribute: Attribute;

@@ -1,10 +1,10 @@
-import { Attribute } from "./attribute.model";
-import { heroType } from "../types/hero.type";
-import { subHeroType } from "../types/hero.type";
-import { IHero } from "../interfaces/hero.interfaces";
-import { IAttribute } from "../interfaces/attribute.interfaces";
-import { IProduct } from "../interfaces/product.interfaces";
-import { teamSide } from "../types/team.type";
+import { Attribute } from "./attribute.model.js";
+import { heroType } from "../types/hero.type.js";
+import { subHeroType } from "../types/hero.type.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
+import { IAttribute } from "../interfaces/attribute.interfaces.js";
+import { IProduct } from "../interfaces/product.interfaces.js";
+import { teamSide } from "../types/team.type.js";
 
 export class Hero implements IHero {
     public idUser: string;

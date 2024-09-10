@@ -1,6 +1,6 @@
-import { teamSide } from "../types/team.type";
-import { ITeam } from "../interfaces/team.interface";
-import { IHero } from "../interfaces/hero.interfaces";
+import { teamSide } from "../types/team.type.js";
+import { ITeam } from "../interfaces/team.interface.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
 export class Team implements ITeam {
     public players: IHero[];
     public teamSide: teamSide;

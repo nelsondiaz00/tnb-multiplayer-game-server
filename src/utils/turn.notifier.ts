@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
-import { ITurn } from "../interfaces/turn.interface";
-import logger from "./logger";
+import { ITurn } from "../interfaces/turn.interface.js";
+import logger from "./logger.js";
 
 export class TurnNotifier {
     private io: Server;

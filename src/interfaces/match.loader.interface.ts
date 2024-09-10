@@ -1,5 +1,5 @@
-import { IMatch } from "./match.interfaces";
-import { IHero } from "./hero.interfaces";
+import { IMatch } from "./match.interfaces.js";
+import { IHero } from "./hero.interfaces.js";
 
 export interface IMatchLoader {
     addPlayerToTeam(hero: IHero): void;

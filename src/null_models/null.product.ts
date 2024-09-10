@@ -1,4 +1,4 @@
-import { Product } from "../models/product.model";
+import { Product } from "../models/product.model.js";
 
 export class NullProduct extends Product {
     constructor() {
@@ -13,7 +13,7 @@ export class NullProduct extends Product {
             [],
             [],
             "imagePath",
-            "powerCost"
+            0
         );
     }
 

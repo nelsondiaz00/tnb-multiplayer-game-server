@@ -1,4 +1,4 @@
-import { Hero } from "../models/hero.model";
+import { Hero } from "../models/hero.model.js";
 
 export class NullHero extends Hero {
     constructor() {

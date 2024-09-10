@@ -1,10 +1,10 @@
 {
-    "name": "tnb-server", 
+    "name": "tnb-server",
     "version": "1.0.0",
     "main": "src/index.ts",
     "type": "module",
     "scripts": {
-        "dev": "npx tsx src/index.ts", 
+        "dev": "npx tsc && npx tsx src/index.ts",
         "test": "jest"
     },
     "jest": {

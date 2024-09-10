@@ -1,9 +1,9 @@
 import { Server, Socket } from "socket.io";
-import { IMatchLoader } from "../interfaces/match.loader.interface";
-import { ITurns } from "../interfaces/turns.interface";
-import logger from "../utils/logger";
-import { IHero } from "../interfaces/hero.interfaces";
-import { IMatch } from "../interfaces/match.interfaces";
+import { IMatchLoader } from "../interfaces/match.loader.interface.js";
+import { ITurns } from "../interfaces/turns.interface.js";
+import logger from "../utils/logger.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
+import { IMatch } from "../interfaces/match.interfaces.js";
 
 export class SocketHandler {
     private io: Server;
@@ -28,10 +28,17 @@ export class SocketHandler {
     }
 
     private handleBindInfo(hero: IHero): void {
-        logger.info("Información recibida: ", hero);
+        // logger.info(`info: ${JSON.stringify(hero)}`);
+        // logger.info("meme");
+        // logger.info("Información recibida: ", hero);
+        // console.log("acá llega");
+        // console.log("acá no");
+        // console.log("acá no");
         this.matchLoader.addPlayerToTeam(hero);
+        
         const match = this.matchLoader.getMatch();
         this.io.emit("newUser", this.serializeMatch(match));
+        console.log("emitido", this.serializeMatch(match));
     }
 
     private handleStartBattle(): void {

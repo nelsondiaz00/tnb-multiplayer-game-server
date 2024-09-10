@@ -1,11 +1,11 @@
 import { Server } from "socket.io";
-import { ITurns } from "../interfaces/turns.interface";
-import { IMatch } from "../interfaces/match.interfaces";
-import { Turn } from "../models/turn.model";
-import { ITurn } from "../interfaces/turn.interface";
-import { TurnNotifier } from "../utils/turn.notifier";
-import logger from "../utils/logger";
-import { IMatchLoader } from "../interfaces/match.loader.interface";
+import { ITurns } from "../interfaces/turns.interface.js";
+import { IMatch } from "../interfaces/match.interfaces.js";
+import { Turn } from "../models/turn.model.js";
+import { ITurn } from "../interfaces/turn.interface.js";
+import { TurnNotifier } from "../utils/turn.notifier.js";
+import logger from "../utils/logger.js";
+import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 
 const TURN_DURATION_MS = 5000;
 
@@ -32,7 +32,9 @@ export class Turns implements ITurns {
 
         const redTeam = matchInfo.teams.get("red");
         if (redTeam == undefined) {
-            logger.error("Looks like redTeam does not exist, you are really good at this arent u.");
+            logger.error(
+                "Looks like redTeam does not exist, you are really good at this arent u."
+            );
             return;
         }
 
@@ -79,6 +81,9 @@ export class Turns implements ITurns {
 
     callNextTurn(): void {
         if (this.rotationStarted) this.nextTurnFunction();
-        else logger.info("Take it easy man, the rotation has to be started yet.");
+        else
+            logger.info(
+                "Take it easy man, the rotation has to be started yet."
+            );
     }
 }

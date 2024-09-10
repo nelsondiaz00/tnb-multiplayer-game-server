@@ -1,5 +1,5 @@
-import { IAttribute } from "./attribute.interfaces";
-import { targetType } from "../types/effect.type";
+import { IAttribute } from "./attribute.interfaces.js";
+import { targetType } from "../types/effect.type.js";
 
 export interface IEffect {
     attribute: IAttribute;
