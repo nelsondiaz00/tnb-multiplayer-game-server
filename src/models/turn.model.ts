@@ -1,5 +1,5 @@
-import { ITurn } from "../interfaces/turn.interface";
-import { teamSide } from "../types/team.type";
+import { ITurn } from "../interfaces/turn.interface.js";
+import { teamSide } from "../types/team.type.js";
 
 export class Turn implements ITurn {
     side: teamSide;

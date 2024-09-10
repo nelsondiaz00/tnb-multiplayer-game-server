@@ -1,9 +1,9 @@
-import { IMatch } from "./match.interfaces";
-import { BindInfo } from "../models/bind.model";
+import { IMatch } from "./match.interfaces.js";
+import { IHero } from "./hero.interfaces.js";
 
 export interface IMatchLoader {
-    addPlayerToTeam(bindInfo: BindInfo): void;
+    addPlayerToTeam(hero: IHero): void;
     getMatch(): IMatch;
-    affectSkills(perpetratorId: string, productId: string, victimId: string): void;
-    affectPlayerHealth(perpetratorId: string, victimId: string): void;
+    useHability(perpetratorId: string, productId: string, victimId: string): void;
+    givePower(heroId: string): void;
 }

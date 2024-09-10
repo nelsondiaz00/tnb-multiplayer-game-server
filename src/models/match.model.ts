@@ -1,6 +1,6 @@
-import { teamSide } from "../types/team.type";
-import { IMatch } from "../interfaces/match.interfaces";
-import { ITeam } from "../interfaces/team.interface";
+import { teamSide } from "../types/team.type.js";
+import { IMatch } from "../interfaces/match.interfaces.js";
+import { ITeam } from "../interfaces/team.interface.js";
 
 export class Match implements IMatch {
     public idMatch: string;

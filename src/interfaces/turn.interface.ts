@@ -1,4 +1,4 @@
-import { teamSide } from "../types/team.type";
+import { teamSide } from "../types/team.type.js";
 
 export interface ITurn {
     side: teamSide;

@@ -1,10 +1,11 @@
 import { Server } from "socket.io";
-import { ITurns } from "../interfaces/turns.interface";
-import { IMatch } from "../interfaces/match.interfaces";
-import { Turn } from "../models/turn.model";
-import { ITurn } from "../interfaces/turn.interface";
-import { TurnNotifier } from "../utils/turn.notifier";
-import logger from "../utils/logger";
+import { ITurns } from "../interfaces/turns.interface.js";
+import { IMatch } from "../interfaces/match.interfaces.js";
+import { Turn } from "../models/turn.model.js";
+import { ITurn } from "../interfaces/turn.interface.js";
+import { TurnNotifier } from "../utils/turn.notifier.js";
+import logger from "../utils/logger.js";
+import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 
 const TURN_DURATION_MS = 5000;
 
@@ -15,9 +16,11 @@ export class Turns implements ITurns {
     private nextTurnFunction!: () => void;
     private circularList: ITurn[] = [];
     private turnNotifier: TurnNotifier;
+    private matchLoader: IMatchLoader;
 
-    constructor(io: Server) {
+    constructor(io: Server, matchLoader: IMatchLoader) {
         this.turnNotifier = new TurnNotifier(io);
+        this.matchLoader = matchLoader;
     }
 
     private updateCircularList(matchInfo: IMatch) {
@@ -58,6 +61,7 @@ export class Turns implements ITurns {
         const nextTurn = () => {
             const currentUser = this.circularList[index];
             this.turnNotifier.notifyTurn(currentUser);
+            this.matchLoader.givePower(currentUser.idUser);
 
             index = (index + 1) % this.circularList.length;
 

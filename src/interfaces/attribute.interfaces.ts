@@ -1,4 +1,4 @@
-import { attributeName } from "../types/attribute.type";
+import { attributeName } from "../types/attribute.type.js";
 
 export interface IAttribute {
     name: attributeName;

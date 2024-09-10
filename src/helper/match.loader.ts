@@ -1,24 +1,28 @@
-import { IEffect } from "../interfaces/effect.interfaces";
-import { IHero } from "../interfaces/hero.interfaces";
-import { IMatch } from "../interfaces/match.interfaces";
-import { IProduct } from "../interfaces/product.interfaces";
-import { ITeam } from "../interfaces/team.interface";
-import { IMatchLoader } from "../interfaces/match.loader.interface";
-import { BindInfo } from "../models/bind.model";
-import { Match } from "../models/match.model";
-import { Team } from "../models/team.model";
-import { NullHero } from "../null_models/null.hero";
-import { NullProduct } from "../null_models/null.product";
-import { NullTeam } from "../null_models/null.team";
+import { IEffect } from "../interfaces/effect.interfaces.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
+import { IMatch } from "../interfaces/match.interfaces.js";
+import { IProduct } from "../interfaces/product.interfaces.js";
+import { ITeam } from "../interfaces/team.interface.js";
+import { IMatchLoader } from "../interfaces/match.loader.interface.js";
+import { Match } from "../models/match.model.js";
+import { Team } from "../models/team.model.js";
+import { NullHero } from "../null_models/null.hero.js";
+import { NullProduct } from "../null_models/null.product.js";
+import { NullTeam } from "../null_models/null.team.js";
 import {
     AdditionStrategy,
     EffectStrategy,
     MultiplicationStrategy,
     SubtractionStrategy,
-} from "../utils/operator.strategy";
-import { teamSide } from "../types/team.type";
-import logger from "../utils/logger";
-import { GameSettings } from "../utils/game.settings";
+} from "../utils/operator.strategy.js";
+import { teamSide } from "../types/team.type.js";
+import logger from "../utils/logger.js";
+import { GameSettings } from "../utils/game.settings.js";
+import { Server } from "socket.io";
+import { parentPort } from 'worker_threads';
+
+
+const POWER_PER_TURN = 2;
 
 export class MatchLoader implements IMatchLoader {
     private match: IMatch;
@@ -30,7 +34,9 @@ export class MatchLoader implements IMatchLoader {
     private heroMap: Map<string, IHero>;
     private productMap: Map<string, IProduct>;
 
-    constructor() {
+    private io: Server;
+
+    constructor(matchId: string, io: Server) {
         this.blueTeam = new Team([], "blue", true);
         this.redTeam = new Team([], "red", true);
 
@@ -38,125 +44,133 @@ export class MatchLoader implements IMatchLoader {
         this.teams.set("blue", this.blueTeam);
         this.teams.set("red", this.redTeam);
 
-        this.match = new Match("TODO", this.teams);
+        this.match = new Match(matchId, this.teams);
 
         this.heroMap = new Map();
         this.productMap = new Map();
+
+        this.io = io;
     }
 
-    addPlayerToTeam(bindInfo: BindInfo): void {
-        if (this.heroMap.get(bindInfo.hero.idUser) != undefined) {
+    addPlayerToTeam(hero: IHero): void {
+
+        if (this.heroMap.get(hero.idUser) != undefined) {
             logger.error("trying to add a user that already is here????");
             return;
         }
 
-        if (bindInfo.teamSide == "blue") this.blueTeam.addHero(bindInfo.hero);
-        else if (bindInfo.teamSide == "red")
-            this.redTeam.addHero(bindInfo.hero);
+        if (hero.teamSide == "blue") this.blueTeam.addHero(hero);
+        else if (hero.teamSide == "red") this.redTeam.addHero(hero);
 
-        this.heroMap.set(bindInfo.hero.idUser, bindInfo.hero);
-
-        bindInfo.hero.products.forEach((product) => {
+        this.heroMap.set(hero.idUser, hero);
+        // console.log("acá no...", hero, " --- ", hero.products);
+        hero.products.forEach((product) => {
+            
             if (this.productMap.get(product.idProduct) == undefined)
                 this.productMap.set(product.idProduct, product);
         });
     }
 
-    affectSkills(
-        perpetratorId: string,
-        productId: string,
-        victimId: string
-    ): void {
-        const product: IProduct = this.getProduct(productId);
-        if (product === null) {
-            logger.error("the product is null, guess that shouldnt happen");
+    useHability(perpetratorId: string, productId: string, victimId: string): void {
+        const perpetrator = this.getHero(perpetratorId);
+        const product = this.getProduct(productId);
+
+        if (product == null || perpetrator == null) {
+            logger.error("the perpetrator or the product, someone is null, wtf is this code man.");
+            return;
+        } else if (perpetrator.attributes["power"].value < product.powerCost) {
+            logger.error("not enough power? try some perico");
             return;
         }
 
+        const victim = this.getHero(victimId);
+        if (victim == null) {
+            logger.error("victim null UnU");
+            return;
+        }
+
+        this.affectPlayerHealth(perpetrator, victim);
+        this.affectSkills(perpetratorId, product, victimId);
+        this.affectPlayerPower(perpetrator, product);
+    }
+
+    getMatch(): IMatch { return this.match; }
+
+    givePower(heroId: string) {
+        const hero = this.heroMap.get(heroId);
+        if (hero == undefined) {
+            console.error("paila mani no le puedo dar power porque el heroe ni existe en esta partida.");
+            return;
+        }
+        if(hero.attributes["power"].value + POWER_PER_TURN <= hero.attributes["power"].valueConstant) {
+            hero.attributes["power"].value += POWER_PER_TURN;
+        }
+    }
+
+    private affectSkills(perpetratorId: string, product: IProduct, victimId: string): void {
         const perpetratorSide: ITeam = this.getTeam(perpetratorId);
-        if (perpetratorSide.isNull()) {
-            logger.error(
-                "the perpetrator team is null, guess that shouldnt happen"
-            );
-            return;
-        }
-
         const victimSide: ITeam = this.getTeam(victimId);
-        if (victimSide.isNull()) {
-            logger.error("the victim team is null, guess that shouldnt happen");
+
+        if (perpetratorSide == null || victimSide == null) {
+            logger.error("the perpetratorTeam or the victimTeam, someone is null, but who can be?? Its sherlock time");
             return;
         }
 
-        const effectTarget = (effect: IEffect) =>
-            effect.target === "ally" ? perpetratorSide : victimSide;
+        const effectTarget = (effect: IEffect) => effect.target === "ally" ? perpetratorSide : victimSide;
 
         product.effects.forEach((effect) => {
             this.affectTeam(effectTarget(effect), effect);
         });
     }
 
-    affectPlayerHealth(perpetratorId: string, victimId: string): void {
-        const perpetrator: IHero = this.getHero(perpetratorId);
-        const victim: IHero = this.getHero(victimId);
-
-        // console.log(
-        //     perpetrator,
-        //     " PERPEPERPEPERPEPERPEPERPEPERPEPERPEPERPEPERPE"
-        // );
-        // console.log(victim, " VICTIMAVICTIMAVICTIMAVICTIMAVICTIMAVICTIMA");
-
-        if (perpetrator === null || victim === null) {
-            logger.error(
-                "the perpetrator or the victim, someone is null, wtf is this code man."
-            );
-            return;
-        }
-
-        if (
-            perpetrator.attributes["attack"].value <
-            victim.attributes["defense"].value
-        ) {
+    private affectPlayerHealth(perpetrator: IHero, victim: IHero): void {
+        if (perpetrator.attributes["attack"].value < victim.attributes["defense"].value) {
             logger.info("victim is so tanky, no damage taken");
             return;
         }
-        if (
-            victim.attributes["blood"].value -
-                perpetrator.attributes["attack"].value >
-            0
-        ) {
+
+        // hay que calcular el daño primero llamando el modulo de juan
+        if (victim.attributes["blood"].value - perpetrator.attributes["attack"].value > 0) {
             logger.info("perpetrator hits!, victim still alive");
-            victim.attributes["blood"].value -=
-                perpetrator.attributes["attack"].value;
+            victim.attributes["blood"].value -= perpetrator.attributes["attack"].value;
             return;
         }
 
         victim.attributes["blood"].value = 0;
         victim.alive = false;
 
-        const victimTeam = this.getTeam(victimId);
-        if (victimTeam.isNull()) {
+        const victimTeam = this.getTeam(victim.idUser);
+        if (victimTeam == null) {
             logger.error("victimTeam null :))))");
             return;
         }
 
-        victimTeam.teamSide === "blue"
-            ? GameSettings.addBlueDead()
-            : GameSettings.addRedDead();
-        // console.log(GameSettings.blueAlive, " -- ", GameSettings.redAlive);
+        victimTeam.teamSide === "blue" ? GameSettings.addBlueDead() : GameSettings.addRedDead();
         if (!GameSettings.blueAlive || !GameSettings.redAlive) {
             victimTeam.alive = false;
-            //endMatch()?
+            this.endMatch(perpetrator.teamSide);
             logger.info("x.x");
         }
     }
 
-    private getHero(idHero: string): IHero {
-        return this.heroMap.get(idHero) ?? new NullHero();
+    private affectPlayerPower(perpetrator: IHero, product: IProduct): void {
+        if (perpetrator.attributes["power"].value < product.powerCost) {
+            logger.info("not enough power to use the product");
+            return;
+        }
+    
+        perpetrator.attributes["power"].value -= product.powerCost;
+    
+        if (perpetrator.attributes["power"].value < 0) {
+            perpetrator.attributes["power"].value = 0;
+        }
+    
+        logger.info(`perpetrator used power, remaining power: ${perpetrator.attributes["power"].value}`);
     }
 
-    private getProduct(idProduct: string): IProduct {
-        return this.productMap.get(idProduct) ?? new NullProduct();
-    }
+    private getHero(idHero: string): IHero { return this.heroMap.get(idHero) ?? new NullHero(); }
+
+    private getProduct(idProduct: string): IProduct { return this.productMap.get(idProduct) ?? new NullProduct(); }
 
     private getTeam(idHero: string): ITeam {
         const firstSide = this.teams.get("blue");
@@ -174,20 +188,12 @@ export class MatchLoader implements IMatchLoader {
         return new NullTeam();
     }
 
-    getMatch(): IMatch {
-        return this.match;
-    }
-
     private affectTeam(side: ITeam, effect: IEffect): void {
         const strategy: EffectStrategy = this.getStrategy(effect.mathOperator);
 
         side.players.forEach((player) => {
-            //  console.log(effect, " playerplayerplayerplayerplayerplayer");
             player.attributes[effect.attribute.name].value =
-                strategy.applyEffect(
-                    player.attributes[effect.attribute.name].value,
-                    effect.value
-                );
+                strategy.applyEffect(player.attributes[effect.attribute.name].value, effect.value);
         });
     }
 
@@ -202,5 +208,15 @@ export class MatchLoader implements IMatchLoader {
             default:
                 throw new Error("Unsupported operator");
         }
+    }
+
+    private endMatch(teamSide: teamSide) {
+        if (parentPort) {
+            parentPort.postMessage({ status: "Match ended.", winner: teamSide })
+        }
+        this.io.emit("endMatch", teamSide);
+
+        logger.info("todo bien manito hasta aqui llegamos.")
+        process.exit(0);
     }
 }

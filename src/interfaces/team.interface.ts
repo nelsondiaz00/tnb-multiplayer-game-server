@@ -1,5 +1,5 @@
-import { teamSide } from "../types/team.type";
-import { IHero } from "./hero.interfaces";
+import { teamSide } from "../types/team.type.js";
+import { IHero } from "./hero.interfaces.js";
 
 export interface ITeam {
     players: IHero[];

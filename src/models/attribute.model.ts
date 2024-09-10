@@ -1,5 +1,5 @@
-import { IAttribute } from "../interfaces/attribute.interfaces";
-import { attributeName } from "../types/attribute.type";
+import { IAttribute } from "../interfaces/attribute.interfaces.js";
+import { attributeName } from "../types/attribute.type.js";
 export class Attribute implements IAttribute {
     public name: attributeName;
     public value: number;

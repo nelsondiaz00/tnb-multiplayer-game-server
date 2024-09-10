@@ -1,6 +1,7 @@
-import { IProduct } from "./product.interfaces";
-import { heroType, subHeroType } from "../types/hero.type";
-import { IAttribute } from "./attribute.interfaces";
+import { IProduct } from "./product.interfaces.js";
+import { heroType, subHeroType } from "../types/hero.type.js";
+import { IAttribute } from "./attribute.interfaces.js";
+import { teamSide } from "../types/team.type.js";
 
 export interface IHero {
     idUser: string;
@@ -9,6 +10,7 @@ export interface IHero {
     attributes: { [key: string]: IAttribute };
     products: IProduct[];
     alive: boolean;
+    teamSide: teamSide;
 
     isNull(): boolean;
 }

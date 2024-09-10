@@ -1,7 +1,7 @@
 // import { Product } from "./product.model";
 import * as math from "mathjs";
-import { Attribute } from "./attribute.model";
-import { ICondition } from "../interfaces/condition.interface";
+import { Attribute } from "./attribute.model.js";
+import { ICondition } from "../interfaces/condition.interface.js";
 
 export class Condition implements ICondition {
     //requiredProduct: Product;

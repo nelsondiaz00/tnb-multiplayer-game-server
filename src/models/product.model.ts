@@ -1,12 +1,12 @@
 import { evaluate } from "mathjs";
-import { productType } from "../types/product.type";
-import { heroType } from "../types/hero.type";
-import { subHeroType } from "../types/hero.type";
-import { IProduct } from "../interfaces/product.interfaces";
-import { IEffect } from "../interfaces/effect.interfaces";
-import { ICondition } from "../interfaces/condition.interface";
-import { IHero } from "../interfaces/hero.interfaces";
-import { IAttribute } from "../interfaces/attribute.interfaces";
+import { productType } from "../types/product.type.js";
+import { heroType } from "../types/hero.type.js";
+import { subHeroType } from "../types/hero.type.js";
+import { IProduct } from "../interfaces/product.interfaces.js";
+import { IEffect } from "../interfaces/effect.interfaces.js";
+import { ICondition } from "../interfaces/condition.interface.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
+import { IAttribute } from "../interfaces/attribute.interfaces.js";
 
 export class Product implements IProduct {
     public idProduct: string;
@@ -19,7 +19,7 @@ export class Product implements IProduct {
     public effects: IEffect[];
     public conditions: ICondition[];
     public imagePath: string;
-    public powerCost: string;
+    public powerCost: number;
 
     constructor(
         idProduct: string,
@@ -32,7 +32,7 @@ export class Product implements IProduct {
         effects: IEffect[],
         conditions: ICondition[],
         imagePath: string,
-        powerCost: string
+        powerCost: number
     ) {
         this.idProduct = idProduct;
         this.productType = productType;
