@@ -6,4 +6,5 @@ export interface IMatchLoader {
     getMatch(): IMatch;
     useHability(perpetratorId: string, productId: string, victimId: string): void;
     givePower(heroId: string): void;
+    getHeroCount(): number;
 }

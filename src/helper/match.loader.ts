@@ -150,6 +150,7 @@ export class MatchLoader implements IMatchLoader {
             victimTeam.alive = false;
             this.endMatch(perpetrator.teamSide);
             logger.info("x.x");
+            return;
         }
     }
 
@@ -217,6 +218,10 @@ export class MatchLoader implements IMatchLoader {
         this.io.emit("endMatch", teamSide);
 
         logger.info("todo bien manito hasta aqui llegamos.")
-        process.exit(0);
+        // process.exit(0);
+    }
+
+    public getHeroCount(): number {
+        return this.heroMap.size;
     }
 }

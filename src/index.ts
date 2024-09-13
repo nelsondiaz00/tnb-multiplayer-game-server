@@ -15,11 +15,12 @@ const io = new Server(server, {
 
 const MAIN_SERVER_PORT = 3000;
 let currentPort = 3001;
+const activeMatches = new Set<any>();
 
 io.on("connection", (socket) => {
     logger.info(`Cliente conectado: ${socket.id}`);
     socket.on("createMatch", (data) => {
-        logger.info("Solicitud de nueva partida recibida:", data);
+        logger.info(`Solicitud de nueva partida recibida: ${data}`);
 
         const { amountRed, amountBlue } = data;
         const matchPort = currentPort++;
@@ -28,23 +29,35 @@ io.on("connection", (socket) => {
             workerData: { port: matchPort, amountRed, amountBlue },
         });
 
+        activeMatches.add({
+            port: matchPort,
+            amountRed: amountRed,
+            amountBlue: amountBlue,
+        });
+
+        socket.emit("activeMatches", Array.from(activeMatches));
+
         socket.emit("matchDetails", { port: matchPort });
 
         worker.on("message", (msg) => {
-            logger.info(`Match on port ${matchPort} says:`, msg);
+            logger.info(`Match on port ${matchPort} says: ${msg}`);
             socket.emit("matchWinner", msg);
         });
 
         worker.on("error", (err) => {
             logger.error(
-                `Match on port ${matchPort} encountered an error:`,
-                err
+                `Match on port ${matchPort} encountered an error: ${err}`
             );
         });
 
         worker.on("exit", (code) => {
             logger.info(`Match on port ${matchPort} exited with code ${code}`);
         });
+    });
+
+    socket.on("getActiveMatches", () => {
+        logger.info("Solicitud para obtener partidas activas recibida.");
+        socket.emit("activeMatches", Array.from(activeMatches));
     });
 });
 
