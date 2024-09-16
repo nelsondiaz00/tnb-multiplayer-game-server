@@ -6,31 +6,16 @@ export class Match implements IMatch {
     public idMatch: string;
     public teams: Map<teamSide, ITeam>;
     public size: number;
+    public owner: string
 
     constructor(idMatch: string, teams: Map<teamSide, ITeam>) {
         this.teams = teams;
         this.idMatch = idMatch;
         this.size = teams.size;
-    }
-    // simulacion de juego
-    startGame() {
-        console.log("Bienvenindos a The Nexus Battle III");
-        this.setTurns();
-
-        // while (this.size > 1) {
-
-        // }
+        this.owner = "none";
     }
 
-    setTurns(): void {
-        this.teams.forEach((team: ITeam) => {
-            for (let i = team.players.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [team.players[i], team.players[j]] = [
-                    team.players[j],
-                    team.players[i],
-                ];
-            }
-        });
+    setOwner(idUser: string): void {
+        this.owner = idUser;
     }
 }

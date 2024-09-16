@@ -1,4 +1,4 @@
-import { workerData } from "worker_threads";
+import { parentPort, workerData } from "worker_threads";
 import express from "express";
 import morgan from "morgan";
 import http from "node:http";
@@ -8,6 +8,7 @@ import { SocketHandler } from "./helper/socket.handler.js";
 import { MatchLoader } from "./helper/match.loader.js";
 import { Turns } from "./helper/turns.js";
 import { GameSettings } from "./utils/game.settings.js";
+import { IWorker } from "./interfaces/IWorker.interface.js";
 
 const morganStream = {
     write: (message: string) => logger.info(message.trim()),
@@ -15,7 +16,7 @@ const morganStream = {
 
 const { port, amountRed, amountBlue } = workerData;
 
-export class MatchWorker {
+export class MatchWorker implements IWorker {
     private app = express();
     private server = http.createServer(this.app);
     private io: Server;
@@ -33,7 +34,6 @@ export class MatchWorker {
         });
 
         this.matchLoader = new MatchLoader(port.toString(), this.io);
-        // aqui le puedo pasar matchLoader a turns para que le de power
         this.turns = new Turns(this.io, this.matchLoader);
 
         this.socketHandler = new SocketHandler(
@@ -57,7 +57,18 @@ export class MatchWorker {
             logger.info(`Match running on port ${this.port}`);
         });
     }
+
+    getPlayersAmount(): number {
+        return this.matchLoader.getHeroCount();
+    }
 }
 
 const matchInstance = new MatchWorker(port, amountRed, amountBlue);
 matchInstance.start();
+
+parentPort?.on("message", (msg) => {
+    if (msg === "getPlayersAmount") {
+        const playersAmount = matchInstance.getPlayersAmount();
+        parentPort?.postMessage({ type: "playersAmount", data: playersAmount });
+    }
+});

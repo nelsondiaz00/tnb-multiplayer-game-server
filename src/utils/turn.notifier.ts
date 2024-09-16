@@ -9,10 +9,13 @@ export class TurnNotifier {
         this.io = io;
     }
 
-    notifyTurn(turn: ITurn): void {
+    notifyTurn(turn: ITurn, serializedMatch: unknown): void {
         this.io.emit("turnInfo", turn);
-        logger.info(
-            `Turno del héroe con ID: ${turn.idUser}, Side: ${turn.side}`
-        );
+        this.io.emit("actualMatch", serializedMatch);
+        logger.info(`Turno del héroe con ID: ${turn.idUser}, Side: ${turn.side}`);
+    }
+
+    emitMatch(serializedMatch: unknown): void {
+        this.io.emit("actualMatch", serializedMatch);
     }
 }

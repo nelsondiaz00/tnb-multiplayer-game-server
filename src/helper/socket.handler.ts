@@ -3,7 +3,6 @@ import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 import { ITurns } from "../interfaces/turns.interface.js";
 import logger from "../utils/logger.js";
 import { IHero } from "../interfaces/hero.interfaces.js";
-import { IMatch } from "../interfaces/match.interfaces.js";
 
 export class SocketHandler {
     private io: Server;
@@ -20,7 +19,7 @@ export class SocketHandler {
         logger.info("a user has connected!", socket.id);
 
         socket.on("bindInfo", (hero: IHero) => this.handleBindInfo(hero));
-        socket.on("startBattle", () => this.handleStartBattle());
+        socket.on("startBattle", (idUser: string) => this.handleStartBattle(idUser));
         socket.on("passTurn", () => this.turns.callNextTurn());
         socket.on("useHability", (perpetratorId, productId, victimId) => this.handleUseHability(perpetratorId, productId, victimId));
         socket.on("getMatch", () => this.io.emit("actualMatch", this.matchLoader.getMatch()));
@@ -28,35 +27,23 @@ export class SocketHandler {
     }
 
     private handleBindInfo(hero: IHero): void {
-        // logger.info(`info: ${JSON.stringify(hero)}`);
-        // logger.info("meme");
-        // logger.info("Información recibida: ", hero);
-        // console.log("acá llega");
-        // console.log("acá no");
-        // console.log("acá no");
         this.matchLoader.addPlayerToTeam(hero);
-        
-        const match = this.matchLoader.getMatch();
-        this.io.emit("newUser", this.serializeMatch(match));
-        console.log("emitido", this.serializeMatch(match));
+
+        const match = this.matchLoader.getSerializedMatch();
+        this.io.emit("newUser", match);
+        logger.info(`emited ${match}`);
     }
 
-    private handleStartBattle(): void {
-        this.turns.startTurnRotation(this.matchLoader.getMatch());
+    private handleStartBattle(idUser: string): void {
+        if (this.matchLoader.getOwner() == idUser) {
+            this.matchLoader.loadAI();
+            this.turns.startTurnRotation(this.matchLoader.getMatch());
+        }
+        else logger.info("pailangas tangas");
     }
 
     private handleUseHability(perpetratorId: string, productId: string, victimId: string): void {
         this.matchLoader.useHability(perpetratorId, productId, victimId);
-        this.io.emit("actualMatch", this.serializeMatch(this.matchLoader.getMatch()));
+        this.io.emit("actualMatch", this.matchLoader.getSerializedMatch());
     }
-
-    private serializeMatch(match: IMatch): unknown {
-        return {
-            idMatch: match.idMatch,
-            size: match.size,
-            teams: Object.fromEntries(match.teams),
-        };
-    }
-
-
 }
