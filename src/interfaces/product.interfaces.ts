@@ -18,6 +18,7 @@ export interface IProduct {
     imagePath: string;
     powerCost: number;
 
+    //?
     useProduct(target: IHero): { [key: string]: IAttribute };
     isNull(): boolean;
 }

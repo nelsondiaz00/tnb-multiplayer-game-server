@@ -20,6 +20,7 @@ import logger from "../utils/logger.js";
 import { GameSettings } from "../utils/game.settings.js";
 import { Server } from "socket.io";
 import { parentPort } from 'worker_threads';
+import { AIUtil } from "../utils/ai.js";
 
 
 const POWER_PER_TURN = 2;
@@ -32,6 +33,7 @@ export class MatchLoader implements IMatchLoader {
     private redTeam: ITeam;
 
     private heroMap: Map<string, IHero>;
+    private aiMap: Map<string, IHero>;
     private productMap: Map<string, IProduct>;
 
     private io: Server;
@@ -47,13 +49,13 @@ export class MatchLoader implements IMatchLoader {
         this.match = new Match(matchId, this.teams);
 
         this.heroMap = new Map();
+        this.aiMap = new Map();
         this.productMap = new Map();
 
         this.io = io;
     }
 
     addPlayerToTeam(hero: IHero): void {
-
         if (this.heroMap.get(hero.idUser) != undefined) {
             logger.error("trying to add a user that already is here????");
             return;
@@ -62,10 +64,9 @@ export class MatchLoader implements IMatchLoader {
         if (hero.teamSide == "blue") this.blueTeam.addHero(hero);
         else if (hero.teamSide == "red") this.redTeam.addHero(hero);
 
+        if (this.heroMap.size == 0) this.match.setOwner(hero.idUser);
         this.heroMap.set(hero.idUser, hero);
-        // console.log("acá no...", hero, " --- ", hero.products);
         hero.products.forEach((product) => {
-            
             if (this.productMap.get(product.idProduct) == undefined)
                 this.productMap.set(product.idProduct, product);
         });
@@ -107,6 +108,47 @@ export class MatchLoader implements IMatchLoader {
         }
     }
 
+    getSerializedMatch(): unknown {
+        return {
+            idMatch: this.match.idMatch,
+            size: this.match.size,
+            teams: Object.fromEntries(this.match.teams),
+        };
+    }
+
+    getOwner(): string { return this.match.owner; }
+
+    loadAI(): void {
+        let playersInBlue: number = this.playersInTeam('blue');
+        let playersInRed: number = this.playersInTeam('red');
+
+        if (playersInBlue < GameSettings.getBluePlayers()) {
+            logger.info(`adding ${(GameSettings.getBluePlayers() - playersInBlue)} ai's to blue team`);
+            for (let i = 0; i < (GameSettings.getBluePlayers() - playersInBlue); i++) {
+                AIUtil.addAiToTeam(this.blueTeam, this.aiMap);
+            }
+        }
+
+        if (playersInRed < GameSettings.getRedPlayers()) {
+            logger.info(`adding ${(GameSettings.getBluePlayers() - playersInBlue)} ai's to red team`);
+            for (let i = 0; i < (GameSettings.getRedPlayers() - playersInRed); i++) {
+                AIUtil.addAiToTeam(this.redTeam, this.aiMap);
+            }
+        }
+    }
+
+    getAiMap(): Map<string, IHero> { return this.aiMap; }
+
+    private playersInTeam(teamSide: teamSide): number {
+        let count = 0;
+        this.heroMap.forEach((hero) => {
+            if (hero.teamSide === teamSide) {
+                count++;
+            }
+        });
+        return count;
+    }
+
     private affectSkills(perpetratorId: string, product: IProduct, victimId: string): void {
         const perpetratorSide: ITeam = this.getTeam(perpetratorId);
         const victimSide: ITeam = this.getTeam(victimId);
@@ -125,7 +167,7 @@ export class MatchLoader implements IMatchLoader {
 
     private affectPlayerHealth(perpetrator: IHero, victim: IHero): void {
         if (perpetrator.attributes["attack"].value < victim.attributes["defense"].value) {
-            logger.info("victim is so tanky, no damage taken");
+            logger.info("victim so tanky, no damage taken");
             return;
         }
 
@@ -152,6 +194,25 @@ export class MatchLoader implements IMatchLoader {
             logger.info("x.x");
             return;
         }
+    }
+
+    getTeamWeakest(teamSide: teamSide): IHero {
+        const team = this.teams.get(teamSide);
+
+        if (!team) {
+            logger.error(`Team ${teamSide} not found`);
+            return new NullHero();
+        }
+
+        let weakestHero: IHero = team.players[0];
+
+        for (const hero of team.players) {
+            const bloodValue: number = hero.attributes['blood'].value;
+
+            if (bloodValue < weakestHero.attributes['blood'].value) weakestHero = hero;
+        }
+
+        return this.getHero(weakestHero.idUser);
     }
 
     private affectPlayerPower(perpetrator: IHero, product: IProduct): void {
@@ -221,7 +282,7 @@ export class MatchLoader implements IMatchLoader {
         // process.exit(0);
     }
 
-    public getHeroCount(): number {
+    getHeroCount(): number {
         return this.heroMap.size;
     }
 }

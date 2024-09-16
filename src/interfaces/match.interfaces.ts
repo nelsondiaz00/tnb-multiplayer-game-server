@@ -5,4 +5,6 @@ export interface IMatch {
     idMatch: string;
     teams: Map<teamSide, ITeam>;
     size: number;
+    owner: string
+    setOwner(idUser: string): void;
 }

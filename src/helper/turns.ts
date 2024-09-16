@@ -6,6 +6,8 @@ import { ITurn } from "../interfaces/turn.interface.js";
 import { TurnNotifier } from "../utils/turn.notifier.js";
 import logger from "../utils/logger.js";
 import { IMatchLoader } from "../interfaces/match.loader.interface.js";
+import { AIUtil } from "../utils/ai.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
 
 const TURN_DURATION_MS = 5000;
 
@@ -32,9 +34,7 @@ export class Turns implements ITurns {
 
         const redTeam = matchInfo.teams.get("red");
         if (redTeam == undefined) {
-            logger.error(
-                "Looks like redTeam does not exist, you are really good at this arent u."
-            );
+            logger.error("Looks like redTeam does not exist, you are really good at this arent u.");
             return;
         }
 
@@ -60,10 +60,29 @@ export class Turns implements ITurns {
 
         const nextTurn = () => {
             const currentUser = this.circularList[index];
-            this.turnNotifier.notifyTurn(currentUser);
-            this.matchLoader.givePower(currentUser.idUser);
+            this.turnNotifier.notifyTurn(currentUser, this.matchLoader.getSerializedMatch());
+
+            //se debe notificar a los demas que es el turno de la ia primero por eso va aca
+            let aiHero = this.matchLoader.getAiMap().get(currentUser.idUser);
+            let isCurrentUserAi: boolean = aiHero !== undefined;
+
+            if (isCurrentUserAi) {
+                let isAiAlive: boolean = aiHero!.alive;
+                if (isAiAlive) {
+                    let victim: IHero = this.matchLoader.getTeamWeakest(aiHero!.teamSide === "blue" ? "red" : "blue");
+
+                    let idHability: string = AIUtil.callAiAPI(aiHero!, victim);
+                     //si la api no responde pasar turno
+                    if (idHability == "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") nextTurn();
+
+                    this.matchLoader.useHability(aiHero!.idUser, idHability, victim.idUser);
+
+                    this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
+                } else nextTurn();
+            }
 
             index = (index + 1) % this.circularList.length;
+            if (index == 0) this.matchLoader.givePower(currentUser.idUser);
 
             //clearTimeout(this.turnTimeout);
             this.turnTimeout = setTimeout(nextTurn, TURN_DURATION_MS);
@@ -81,9 +100,6 @@ export class Turns implements ITurns {
 
     callNextTurn(): void {
         if (this.rotationStarted) this.nextTurnFunction();
-        else
-            logger.info(
-                "Take it easy man, the rotation has to be started yet."
-            );
+        else logger.info("Take it easy man, the rotation has to be started yet.");
     }
 }
