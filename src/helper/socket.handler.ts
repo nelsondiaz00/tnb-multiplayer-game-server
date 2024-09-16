@@ -46,6 +46,7 @@ export class SocketHandler {
     }
 
     private handleUseHability(perpetratorId: string, productId: string, victimId: string): void {
+        this.io.emit("lastPerpetratorName", perpetratorId);
         this.matchLoader.useHability(perpetratorId, productId, victimId);
         this.io.emit("actualMatch", this.serializeMatch(this.matchLoader.getMatch()));
     }

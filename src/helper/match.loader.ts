@@ -9,6 +9,7 @@ import { Team } from "../models/team.model.js";
 import { NullHero } from "../null_models/null.hero.js";
 import { NullProduct } from "../null_models/null.product.js";
 import { NullTeam } from "../null_models/null.team.js";
+import { calculateDamage } from '../utils/probabilities/probabilities.js';
 import {
     AdditionStrategy,
     EffectStrategy,
@@ -129,10 +130,21 @@ export class MatchLoader implements IMatchLoader {
             return;
         }
 
-        // hay que calcular el daño primero llamando el modulo de juan
-        if (victim.attributes["blood"].value - perpetrator.attributes["attack"].value > 0) {
+        const hero = {
+            'tipo-heroe': perpetrator.type.toString(),
+            'subtipo-heroe': perpetrator.subtype.toString(),
+            dano: parseInt((perpetrator.attributes["damage"]).toString()),
+            critico: parseInt((perpetrator.attributes["critical"]).toString())
+          };
+          
+        const damageCaused = parseFloat(calculateDamage(hero).toFixed(1));
+
+        logger.info(`${damageCaused} damage caused`)
+
+        if (victim.attributes["blood"].value - damageCaused > 0) {
             logger.info("perpetrator hits!, victim still alive");
-            victim.attributes["blood"].value -= perpetrator.attributes["attack"].value;
+            victim.attributes["blood"].value -= damageCaused;
+            victim.attributes["blood"].value = parseFloat((victim.attributes["blood"].value).toFixed(1))
             return;
         }
 
