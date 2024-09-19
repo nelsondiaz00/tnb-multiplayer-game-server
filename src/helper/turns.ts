@@ -9,7 +9,7 @@ import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 import { AIUtil } from "../utils/ai.js";
 import { IHero } from "../interfaces/hero.interfaces.js";
 
-const TURN_DURATION_MS = 5000;
+const TURN_DURATION_MS = 180000;
 
 export class Turns implements ITurns {
     private rotationStarted: boolean = false;
@@ -82,10 +82,19 @@ export class Turns implements ITurns {
             }
 
             index = (index + 1) % this.circularList.length;
-            if (index == 0) this.matchLoader.givePower(currentUser.idUser);
+            if (index == 0) {
+                let blueHeroes: IHero[] = this.matchLoader.getMatch().teams.get('blue')!.players;
+                for (let i = 0; i < blueHeroes.length; i++) 
+                    this.matchLoader.givePower(blueHeroes[i].idUser);
+
+                let redHeroes: IHero[] = this.matchLoader.getMatch().teams.get('red')!.players;
+                for (let i = 0; i < redHeroes.length; i++) 
+                    this.matchLoader.givePower(redHeroes[i].idUser);
+            }
 
             //clearTimeout(this.turnTimeout);
             this.turnTimeout = setTimeout(nextTurn, TURN_DURATION_MS);
+
         };
 
         nextTurn();

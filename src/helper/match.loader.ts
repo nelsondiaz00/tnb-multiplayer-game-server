@@ -82,6 +82,7 @@ export class MatchLoader implements IMatchLoader {
             return;
         } else if (perpetrator.attributes["power"].value < product.powerCost) {
             logger.error("not enough power? try some perico");
+            this.io.emit("failedReason", "¡Fallo! Insuficiente poder");
             return;
         }
 
@@ -114,6 +115,7 @@ export class MatchLoader implements IMatchLoader {
             idMatch: this.match.idMatch,
             size: this.match.size,
             teams: Object.fromEntries(this.match.teams),
+            owner: this.match.owner,
         };
     }
 
@@ -169,6 +171,7 @@ export class MatchLoader implements IMatchLoader {
     private affectPlayerHealth(perpetrator: IHero, victim: IHero): void {
         if (perpetrator.attributes["attack"].value < victim.attributes["defense"].value) {
             logger.info("victim so tanky, no damage taken");
+            this.io.emit("failedReason", "¡Fallo! Enemigo muy tanque");
             return;
         }
 
@@ -182,6 +185,12 @@ export class MatchLoader implements IMatchLoader {
         const damageCaused = parseFloat(calculateDamage(hero).toFixed(1));
 
         logger.info(`${damageCaused} damage caused`)
+
+        if(damageCaused === 0){
+            logger.info("perpetrator doesn't hit, victim still alive");
+            this.io.emit("failedReason", "¡Fallo! Ataque no efectivo");
+            return;
+        }
 
         if (victim.attributes["blood"].value - damageCaused > 0) {
             logger.info("perpetrator hits!, victim still alive");
@@ -230,6 +239,7 @@ export class MatchLoader implements IMatchLoader {
     private affectPlayerPower(perpetrator: IHero, product: IProduct): void {
         if (perpetrator.attributes["power"].value < product.powerCost) {
             logger.info("not enough power to use the product");
+            this.io.emit("failedReason", "¡Fallo! No hay suficiente poder");
             return;
         }
     

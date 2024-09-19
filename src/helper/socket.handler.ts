@@ -17,7 +17,6 @@ export class SocketHandler {
 
     public handleConnection(socket: Socket): void {
         logger.info("a user has connected!", socket.id);
-
         socket.on("bindInfo", (hero: IHero) => this.handleBindInfo(hero));
         socket.on("startBattle", (idUser: string) => this.handleStartBattle(idUser));
         socket.on("passTurn", () => this.turns.callNextTurn());
@@ -28,7 +27,6 @@ export class SocketHandler {
 
     private handleBindInfo(hero: IHero): void {
         this.matchLoader.addPlayerToTeam(hero);
-
         const match = this.matchLoader.getSerializedMatch();
         this.io.emit("newUser", match);
         logger.info(`emited ${match}`);
@@ -43,7 +41,7 @@ export class SocketHandler {
     }
 
     private handleUseHability(perpetratorId: string, productId: string, victimId: string): void {
-        this.io.emit("lastPerpetratorName", perpetratorId);
+        this.io.emit("lastAttackName", {perpetratorId: perpetratorId, victimId: victimId});
         this.matchLoader.useHability(perpetratorId, productId, victimId);
         this.io.emit("actualMatch", this.matchLoader.getSerializedMatch());
     }
