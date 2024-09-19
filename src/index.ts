@@ -3,6 +3,8 @@ import { Server } from "socket.io";
 import http from "node:http";
 import express from "express";
 import logger from "./utils/logger.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
@@ -13,10 +15,12 @@ const io = new Server(server, {
     },
 });
 
-const MAIN_SERVER_PORT: number = 3000;
+const MAIN_SERVER_PORT: number = parseInt(process.env['PORT'] || '3000');
+const HOST: string = process.env['HOST'] || 'localhost';
+
 let currentPort: number = 3001;
 const activeMatches = new Set<any>();
-const workers = new Map<number, Worker>;
+const workers = new Map<number, Worker> ();
 
 io.on("connection", (socket) => {
     logger.info(`Cliente conectado: ${socket.id}`);
@@ -30,7 +34,7 @@ io.on("connection", (socket) => {
             workerData: { port: matchPort, amountRed, amountBlue },
         });
 
-        workers.set(currentPort, worker);
+        workers.set(matchPort, worker);
 
         activeMatches.add({
             port: matchPort,
@@ -38,8 +42,8 @@ io.on("connection", (socket) => {
             amountBlue: amountBlue,
         });
 
-        socket.emit("activeMatches", Array.from(activeMatches));
-
+        io.emit("activeMatches", Array.from(activeMatches));
+        logger.info("hasta acá debería llegar, no?");
         socket.emit("matchDetails", { port: matchPort });
 
         worker.on("message", (msg) => {
@@ -67,10 +71,10 @@ io.on("connection", (socket) => {
         const worker = workers.get(port);
         if (worker) {
             worker.postMessage("getPlayersAmount");
-
             worker.once("message", (message) => {
                 if (message.type === "playersAmount") {
-                    socket.emit("amountPlayers", message.data);
+                    socket.emit("playersAmount", message.data);
+                    logger.info(`${message.data}  sí entró`)
                 }
             });
         } else {
@@ -79,6 +83,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(MAIN_SERVER_PORT, () => {
-    logger.info(`Servidor principal corriendo en el puerto: ${MAIN_SERVER_PORT}`);
+server.listen(3000, 'localhost', () => {
+    console.log(`Server is running on http://${HOST}:${MAIN_SERVER_PORT}`);
 });

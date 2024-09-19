@@ -1,0 +1,174 @@
+{
+  "teamSide": "red",
+  "idUser": "user9",
+  "type": "warrior",
+  "subtype": "tank",
+  "attributes": {
+    "health": {
+      "name": "health",
+      "value": 44,
+      "valueMin": 0,
+      "valueMax": 0
+    },
+    "blood": {
+      "name": "blood",
+      "value": 44,
+      "valueMin": 0,
+      "valueMax": 0
+    },
+    "power": {
+      "name": "power",
+      "value": 10,
+      "valueMin": 0,
+      "valueMax": 0,
+      "valueConstant": 10
+    },
+    "defense": {
+      "name": "defense",
+      "value": 0,
+      "valueMin": 0,
+      "valueMax": 0
+    },
+    "attack": {
+      "name": "attack",
+      "value": 5,
+      "valueMin": 1,
+      "valueMax": 6
+    },
+    "damage": {
+      "name": "damage",
+      "value": 0,
+      "valueMin": 1,
+      "valueMax": 4
+    },
+    "critical": {
+      "name": "critical",
+      "value": 0,
+      "valueMin": 0,
+      "valueMax": 0
+    },
+    "level": {
+      "name": "level",
+      "value": 1,
+      "valueMin": 0,
+      "valueMax": 0
+    }
+  },
+  "products": [
+    {
+      "idProduct": "19",
+      "productName": "Magic Sword",
+      "productDescription": "A powerful sword with magical properties.",
+      "productType": "hability",
+      "heroType": "warrior",
+      "subHeroType": "tank",
+      "dropChance": "10%",
+      "powerCost": "2",
+      "effects": [
+        {
+          "attribute": {
+            "name": "level"
+          },
+          "mathOperator": "+",
+          "turns": 0,
+          "target": "ally",
+          "value": 25,
+          "valueCaused": 20
+        }
+      ],
+      "conditions": [],
+      "imagePath": "magic.sword.png"
+    },
+    {
+      "idProduct": "20",
+      "productName": "Magic Sword",
+      "productDescription": "A powerful sword with magical properties.",
+      "productType": "hability",
+      "heroType": "warrior",
+      "subHeroType": "tank",
+      "dropChance": "10%",
+      "powerCost": "3",
+      "effects": [
+        {
+          "attribute": {
+            "name": "critical"
+          },
+          "mathOperator": "+",
+          "turns": 0,
+          "target": "ally",
+          "value": 25,
+          "valueCaused": 20
+        }
+      ],
+      "conditions": [],
+      "imagePath": "punch.png"
+    },
+    {
+      "idProduct": "21",
+      "productName": "Fire Sword",
+      "productDescription": "A powerful sword with magical properties.",
+      "productType": "hability",
+      "heroType": "warrior",
+      "subHeroType": "tank",
+      "dropChance": "10%",
+      "powerCost": "2",
+      "effects": [
+        {
+          "attribute": {
+            "name": "defense"
+          },
+          "mathOperator": "+",
+          "turns": 0,
+          "target": "ally",
+          "value": 25,
+          "valueCaused": 20
+        },
+        {
+          "attribute": {
+            "name": "attack"
+          },
+          "mathOperator": "+",
+          "turns": 0,
+          "target": "enemy",
+          "value": 10,
+          "valueCaused": 15
+        }
+      ],
+      "imagePath": "sword.fire.png"
+    },
+    {
+      "idProduct": "21",
+      "productName": "Fire Sword",
+      "productDescription": "A powerful sword with magical properties.",
+      "productType": "hability",
+      "heroType": "warrior",
+      "subHeroType": "tank",
+      "dropChance": "10%",
+      "powerCost": "3",
+      "effects": [
+        {
+          "attribute": {
+            "name": "defense"
+          },
+          "mathOperator": "+",
+          "turns": 0,
+          "target": "ally",
+          "value": 25,
+          "valueCaused": 20
+        },
+        {
+          "attribute": {
+            "name": "attack"
+          },
+          "mathOperator": "+",
+          "turns": 0,
+          "target": "enemy",
+          "value": 10,
+          "valueCaused": 15
+        }
+      ],
+      "imagePath": "sword.fire.png"
+    }
+  ],
+  "alive": true
+}
