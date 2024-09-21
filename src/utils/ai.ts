@@ -38,8 +38,11 @@ export class AIUtil {
             isNull: () => false,
         }));
 
+        const baseId = randomNpc.idUser.slice(0, 5);
+        const uniqueId = `${baseId}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+
         const newAiHero: IHero = new Hero(
-            randomNpc.idUser,
+            uniqueId,
             randomNpc.type as heroType,
             randomNpc.subtype as subHeroType,
             attributesArray,
