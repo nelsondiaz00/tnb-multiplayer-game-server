@@ -1,5 +1,5 @@
 import { Chart } from 'chart.js';
-import { Random, MersenneTwister19937 } from 'random-js'; // Asegúrate de estar importando correctamente
+import { Random, MersenneTwister19937 } from 'random-js';
 const random = new Random(MersenneTwister19937.autoSeed());
 
 const sorted: number[] = [];
@@ -12,18 +12,14 @@ random.shuffle(sorted);
 
 function boxMullerRandom(mean: number, stddev: number): number {
   let u1 = 0, u2 = 0;
-  // Generar dos números aleatorios entre 0 y 1 que no sean 0
-  while (u1 === 0) u1 = random.real(0, 1); // Utiliza random.real() para generar números entre 0 y 1
+  while (u1 === 0) u1 = random.real(0, 1);
   while (u2 === 0) u2 = random.real(0, 1);
 
-  // Aplicar la transformación de Box-Muller
   const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
 
-  // Ajustar la media y la desviación estándar
   return z0 * stddev + mean;
 }
 
-// Función para generar números aleatorios con distribución normal truncada
 function truncNormalRandom(mean: number, stddev: number, min: number, max: number): number {
   let result: number;
   do {
@@ -37,7 +33,7 @@ export function indiceAleatorio(): number {
 }
 
 export function generarRandom(): number {
-  const randomIndex = indiceAleatorio(); // Cambié el nombre de la variable a 'randomIndex'
+  const randomIndex = indiceAleatorio();
   return sorted[randomIndex];
 }
 
@@ -58,7 +54,7 @@ function generarDatosGraficaNormal(): { x: number[]; y: number[] } {
   const y: number[] = Array(80000).fill(0);
 
   for (let cnt = 0; cnt < 200000; cnt++) {
-    const index = indiceAleatorio(); // Cambié el nombre de la variable a 'index'
+    const index = indiceAleatorio();
     y[index]++;
   }
 
@@ -86,7 +82,7 @@ function generarDatosGrafica(): { x: number[]; y: number[] } {
   const y: number[] = Array(80000).fill(0);
 
   for (let cnt = 0; cnt < 200000; cnt++) {
-    const index = indiceAleatorio(); // Cambié el nombre de la variable a 'index'
+    const index = indiceAleatorio();
     const valor = sorted[index];
     y[valor]++;
   }

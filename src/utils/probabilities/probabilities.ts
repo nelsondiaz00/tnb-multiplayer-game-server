@@ -1,5 +1,5 @@
-import { generarRandom } from './randomizer.js'; // Importar el archivo randomizer
-import { Random, MersenneTwister19937 } from 'random-js'; // Asegúrate de estar importando correctamente
+import { generarRandom } from './randomizer.js';
+import { Random, MersenneTwister19937 } from 'random-js';
 
 const random = new Random(MersenneTwister19937.autoSeed());
 

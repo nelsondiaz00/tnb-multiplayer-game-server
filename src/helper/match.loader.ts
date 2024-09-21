@@ -180,8 +180,8 @@ export class MatchLoader implements IMatchLoader {
             'subtipo-heroe': perpetrator.subtype.toString(),
             dano: parseInt((perpetrator.attributes["damage"]).toString()),
             critico: parseInt((perpetrator.attributes["critical"]).toString())
-          };
-          
+        };
+
         const damageCaused = parseFloat(calculateDamage(hero).toFixed(1));
 
         logger.info(`${damageCaused} damage caused`)

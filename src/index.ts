@@ -15,8 +15,8 @@ const io = new Server(server, {
     },
 });
 
-const MAIN_SERVER_PORT: number = parseInt(process.env['PORT'] || '3000');
-const HOST: string = process.env['HOST'] || 'localhost';
+const MAIN_SERVER_PORT: number = parseInt(process.env['SERVER_MAIN_PORT'] || '3000');
+const HOST: string = process.env['SERVER_HOST'] || 'localhost';
 
 let currentPort: number = 3001;
 const activeMatches = new Set<any>();

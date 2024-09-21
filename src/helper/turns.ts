@@ -71,13 +71,16 @@ export class Turns implements ITurns {
                 if (isAiAlive) {
                     let victim: IHero = this.matchLoader.getTeamWeakest(aiHero!.teamSide === "blue" ? "red" : "blue");
 
-                    let idHability: string = AIUtil.callAiAPI(aiHero!, victim);
-                     //si la api no responde pasar turno
-                    if (idHability == "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") nextTurn();
-
-                    this.matchLoader.useHability(aiHero!.idUser, idHability, victim.idUser);
-
-                    this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
+                    AIUtil.callAiAPI(aiHero!, victim).then((idHability: string) => {
+                        if (idHability === "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") nextTurn();
+                        else {
+                            this.matchLoader.useHability(aiHero!.idUser, idHability, victim.idUser);
+                            this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
+                        }
+                    }).catch((error) => {
+                        logger.error(`Error al llamar a la API de IA: ${error}`);
+                        nextTurn();
+                    });
                 } else nextTurn();
             }
 
@@ -94,7 +97,6 @@ export class Turns implements ITurns {
 
             //clearTimeout(this.turnTimeout);
             this.turnTimeout = setTimeout(nextTurn, TURN_DURATION_MS);
-
         };
 
         nextTurn();

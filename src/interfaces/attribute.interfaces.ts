@@ -6,10 +6,5 @@ export interface IAttribute {
     valueMin: number;
     valueMax: number;
     valueConstant: number;
-
-    // esto si se usa?
     clone(): IAttribute;
-    changeOnValue(): number;
-    getValueChangement(): number;
-    getValueConstant(): number;
 }

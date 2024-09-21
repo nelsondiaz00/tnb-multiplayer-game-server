@@ -37,7 +37,7 @@ export class SocketHandler {
             this.matchLoader.loadAI();
             this.turns.startTurnRotation(this.matchLoader.getMatch());
         }
-        else logger.info("pailangas tangas");
+        else logger.info("pailangas tangas al intentar iniciar la batalla");
     }
 
     private handleUseHability(perpetratorId: string, productId: string, victimId: string): void {
