@@ -63,10 +63,10 @@ export class Turns implements ITurns {
 
         const nextTurn = () => {
             const currentUser: ITurn = this.circularList[index];
-            this.turnNotifier.notifyTurn(currentUser, this.matchLoader.getSerializedMatch());
-
             const previousIndex = (index - 1 + this.circularList.length) % this.circularList.length;
             if (this.wasTurnPassedDueToTimeout) this.handleTurnTimeout(this.circularList[previousIndex].idUser);
+
+            this.turnNotifier.notifyTurn(currentUser, this.matchLoader.getSerializedMatch());
 
             let aiHero = this.matchLoader.getAiMap().get(currentUser.idUser);
             let isCurrentUserAi: boolean = aiHero !== undefined;
