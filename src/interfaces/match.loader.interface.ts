@@ -13,5 +13,6 @@ export interface IMatchLoader {
     loadAI(): void;
     getAiMap(): Map<string, IHero>;
     getTeamWeakest(teamSide: teamSide): IHero;
+    getHeroMap(): Map<string, IHero>;
     //getHero(idHero: string): IHero;
 }

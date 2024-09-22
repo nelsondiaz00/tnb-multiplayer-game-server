@@ -22,9 +22,10 @@ import { GameSettings } from "../utils/game.settings.js";
 import { Server } from "socket.io";
 import { parentPort } from 'worker_threads';
 import { AIUtil } from "../utils/ai.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-
-const POWER_PER_TURN = 2;
+const POWER_PER_TURN: number = parseInt(process.env['POWER_PER_TURN'] || '2');
 
 export class MatchLoader implements IMatchLoader {
     private match: IMatch;
@@ -141,6 +142,8 @@ export class MatchLoader implements IMatchLoader {
     }
 
     getAiMap(): Map<string, IHero> { return this.aiMap; }
+
+    getHeroMap(): Map<string, IHero> { return this.heroMap; }
 
     private playersInTeam(teamSide: teamSide): number {
         let count = 0;

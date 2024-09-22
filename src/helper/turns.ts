@@ -8,8 +8,10 @@ import logger from "../utils/logger.js";
 import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 import { AIUtil } from "../utils/ai.js";
 import { IHero } from "../interfaces/hero.interfaces.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-const TURN_DURATION_MS = 180000;
+const TURN_DURATION_MS: number = parseInt(process.env['TURN_DURATION_MS'] || '180000');
 
 export class Turns implements ITurns {
     private rotationStarted: boolean = false;
@@ -19,6 +21,7 @@ export class Turns implements ITurns {
     private circularList: ITurn[] = [];
     private turnNotifier: TurnNotifier;
     private matchLoader: IMatchLoader;
+    private wasTurnPassedDueToTimeout: boolean = false;
 
     constructor(io: Server, matchLoader: IMatchLoader) {
         this.turnNotifier = new TurnNotifier(io);
@@ -59,50 +62,33 @@ export class Turns implements ITurns {
         let index = 0;
 
         const nextTurn = () => {
-            const currentUser = this.circularList[index];
+            const currentUser: ITurn = this.circularList[index];
             this.turnNotifier.notifyTurn(currentUser, this.matchLoader.getSerializedMatch());
 
-            //se debe notificar a los demas que es el turno de la ia primero por eso va aca
+            const previousIndex = (index - 1 + this.circularList.length) % this.circularList.length;
+            if (this.wasTurnPassedDueToTimeout) this.handleTurnTimeout(this.circularList[previousIndex].idUser);
+
             let aiHero = this.matchLoader.getAiMap().get(currentUser.idUser);
             let isCurrentUserAi: boolean = aiHero !== undefined;
 
-            if (isCurrentUserAi) {
-                let isAiAlive: boolean = aiHero!.alive;
-                if (isAiAlive) {
-                    let victim: IHero = this.matchLoader.getTeamWeakest(aiHero!.teamSide === "blue" ? "red" : "blue");
-
-                    AIUtil.callAiAPI(aiHero!, victim).then((idHability: string) => {
-                        if (idHability === "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") nextTurn();
-                        else {
-                            this.matchLoader.useHability(aiHero!.idUser, idHability, victim.idUser);
-                            this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
-                        }
-                    }).catch((error) => {
-                        logger.error(`Error al llamar a la API de IA: ${error}`);
-                        nextTurn();
-                    });
-                } else nextTurn();
-            }
+            if (isCurrentUserAi) this.execAILogic(aiHero!);
 
             index = (index + 1) % this.circularList.length;
-            if (index == 0) {
-                let blueHeroes: IHero[] = this.matchLoader.getMatch().teams.get('blue')!.players;
-                for (let i = 0; i < blueHeroes.length; i++) 
-                    this.matchLoader.givePower(blueHeroes[i].idUser);
-
-                let redHeroes: IHero[] = this.matchLoader.getMatch().teams.get('red')!.players;
-                for (let i = 0; i < redHeroes.length; i++) 
-                    this.matchLoader.givePower(redHeroes[i].idUser);
-            }
+            if (index == 0) this.givePower();
 
             //clearTimeout(this.turnTimeout);
-            this.turnTimeout = setTimeout(nextTurn, TURN_DURATION_MS);
+            //this.turnTimeout = setTimeout(nextTurn, TURN_DURATION_MS);
+            this.turnTimeout = setTimeout(() => {
+                this.wasTurnPassedDueToTimeout = true;
+                nextTurn();
+            }, TURN_DURATION_MS);
         };
 
         nextTurn();
 
         this.nextTurnFunction = () => {
             clearTimeout(this.turnTimeout);
+            this.wasTurnPassedDueToTimeout = false;
             nextTurn();
         };
 
@@ -112,5 +98,43 @@ export class Turns implements ITurns {
     callNextTurn(): void {
         if (this.rotationStarted) this.nextTurnFunction();
         else logger.info("Take it easy man, the rotation has to be started yet.");
+    }
+
+    private givePower(): void {
+        let blueHeroes: IHero[] = this.matchLoader.getMatch().teams.get('blue')!.players;
+                for (let i = 0; i < blueHeroes.length; i++) 
+                    this.matchLoader.givePower(blueHeroes[i].idUser);
+
+        let redHeroes: IHero[] = this.matchLoader.getMatch().teams.get('red')!.players;
+                for (let i = 0; i < redHeroes.length; i++) 
+                    this.matchLoader.givePower(redHeroes[i].idUser);
+    }
+
+    private execAILogic(aiHero: IHero): void {
+        let isAiAlive: boolean = aiHero.alive;
+        if (isAiAlive) {
+            let victim: IHero = this.matchLoader.getTeamWeakest(aiHero.teamSide === "blue" ? "red" : "blue");
+
+            AIUtil.callAiAPI(aiHero, victim).then((idHability: string) => {
+                if (idHability === "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") this.callNextTurn();
+                else {
+                    this.matchLoader.useHability(aiHero!.idUser, idHability, victim.idUser);
+                    this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
+                }
+            }).catch((error) => {
+                logger.error(`Error al llamar a la API de IA: ${error}`);
+                this.callNextTurn();
+            });
+        } else this.callNextTurn();
+    }
+
+    private handleTurnTimeout(idUser: string) {
+        logger.info(
+            `Todas las mañanas veo una ancianita
+            Muy desesperada preguntando por su hijo
+            Pero ella no sabe que fue reo AUSENTE
+            Se lo capturaron y lo condenaron.`);
+        this.wasTurnPassedDueToTimeout = false;
+        this.matchLoader.getHeroMap().get(idUser)!.alive = false;
     }
 }
