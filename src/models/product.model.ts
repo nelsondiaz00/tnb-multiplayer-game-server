@@ -1,12 +1,9 @@
-import { evaluate } from "mathjs";
 import { productType } from "../types/product.type.js";
 import { heroType } from "../types/hero.type.js";
 import { subHeroType } from "../types/hero.type.js";
 import { IProduct } from "../interfaces/product.interfaces.js";
 import { IEffect } from "../interfaces/effect.interfaces.js";
 import { ICondition } from "../interfaces/condition.interface.js";
-import { IHero } from "../interfaces/hero.interfaces.js";
-import { IAttribute } from "../interfaces/attribute.interfaces.js";
 
 export class Product implements IProduct {
     public idProduct: string;
@@ -45,25 +42,6 @@ export class Product implements IProduct {
         this.conditions = conditions;
         this.imagePath = imagePath;
         this.powerCost = powerCost;
-    }
-
-    useProduct(target: IHero): { [key: string]: IAttribute } {
-        const attributesCopy = { ...target.attributes };
-
-        this.effects.forEach((effect: IEffect) => {
-            const attributeCopy = attributesCopy[effect.attribute.name];
-
-            if (attributeCopy) {
-                const ecuation =
-                    attributeCopy.value + effect.mathOperator + effect.value;
-                attributeCopy.value = evaluate(ecuation);
-                effect.accumulateValue();
-            } else {
-                console.warn("Atributo no encontrado!", effect.attribute.name);
-            }
-        });
-
-        return attributesCopy;
     }
 
     isNull(): boolean {

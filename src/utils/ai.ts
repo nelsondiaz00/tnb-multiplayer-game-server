@@ -1,35 +1,129 @@
-// import { IAttribute } from "../interfaces/attribute.interfaces";
+import { IAttribute } from "../interfaces/attribute.interfaces";
 import { IHero } from "../interfaces/hero.interfaces";
 import { ITeam } from "../interfaces/team.interface";
-// import { Hero } from "../models/hero.model";
-// import { heroType, subHeroType } from "../types/hero.type";
-// import logger from "./logger";
+import { Hero } from "../models/hero.model";
+import { heroType, subHeroType } from "../types/hero.type";
+import dotenv from 'dotenv';
+import logger from "./logger";
+import * as npcs from '../assets/ia-templates/npcs.json';
+import { IProduct } from "../interfaces/product.interfaces";
+dotenv.config();
 
-// const POWER_MAX_VAL = 100;
+const url = process.env.API_URL;
 
 export class AIUtil {
-    static addAiToTeam(team: ITeam, aiMap: Map<string, IHero>): void {
-        console.log(team, aiMap);
-        // seleccionar algun heroe ia y agregarlo al equipo y al mapa
-        // const newAiHero: IHero = new Hero(randomId, randomType, randomSubType, randomAttributes, [], team.teamSide);
-        // team.addHero(newAiHero);
-        // aiMap.set(randomId, newAiHero);
-
-        // logger.info(`AI Hero added to ${team.teamSide} team with id: ${randomId}`);
+    static convertToAttribute(attribute: any): IAttribute {
+        return {
+            name: attribute.name,
+            value: attribute.value,
+            valueMin: attribute.valueMin,
+            valueMax: attribute.valueMax,
+            valueConstant: attribute.valueConstant,
+            clone: function(): IAttribute {
+                return { ...this };
+            }
+        };
     }
 
-    // parsea los datos del heroe a como los recibe la api
-    static callAiAPI(aiHero: IHero, victim: IHero): string {
-        // let toReturn: string = AIUtil.filterHabilityByHero(aiHero, []);
-        console.log(aiHero, victim);
+    static addAiToTeam(team: ITeam, aiMap: Map<string, IHero>): void {
+        const npcHeroes = Object.values(npcs);
 
-        return "pailaLaApiNoRespondioPaseTurnoPorqueQueMas";
+        const randomIndex = Math.floor(Math.random() * npcHeroes.length);
+        const randomNpc = npcHeroes[randomIndex];
+
+        const attributesArray: IAttribute[] = Object.values(randomNpc.attributes).map(this.convertToAttribute);
+
+        const products: IProduct[] = randomNpc.products.map((p: any) => ({
+            ...p,
+            isNull: () => false,
+        }));
+
+        const baseId = randomNpc.idUser.slice(0, 5);
+        const uniqueId = `${baseId}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+
+        const newAiHero: IHero = new Hero(
+            uniqueId,
+            randomNpc.type as heroType,
+            randomNpc.subtype as subHeroType,
+            attributesArray,
+            products,
+            team.teamSide
+        );
+
+        team.addHero(newAiHero);
+
+        aiMap.set(randomNpc.idUser, newAiHero);
+
+        logger.info(`AI Hero added to ${team.teamSide} team with id: ${randomNpc.idUser}`);
+    }
+
+    static callAiAPI(aiHero: IHero, victim: IHero): Promise<string> {
+        const params = this.parseToApi(aiHero, victim);
+
+        async function sendRequest(): Promise<string> {
+            try {
+                const response = await fetch(url as string, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params)
+                });
+
+                if (response.ok) {
+                    const data = await response.json(); 
+                    logger.info(`Habilidades recibidas: ${data}`);
+
+                    return AIUtil.filterHabilityByHero(aiHero, data);
+                } else {
+                    logger.error(`Error en la solicitud: ${response.status}, ${response.statusText}`);
+                    return "pailaLaApiNoRespondioPaseTurnoPorqueQueMas";
+                }
+            } catch (error) {
+                logger.error(`Error en la solicitud ${error}`);
+                return "pailaLaApiNoRespondioPaseTurnoPorqueQueMas";
+            }
+        }
+
+        return sendRequest();
+    }
+
+    static parseToApi(aiHero: IHero, victim: IHero): number[][] {
+        const heroTypes = ['warrior-tank', 'warrior-weapon', 'wizard-fire', 'wizard-ice', 'rogue-poison', 'rogue-machete'];
+        const heroTypeBinary = heroTypes.map(type => (aiHero.type + '-' + aiHero.subtype) === type ? 1 : 0);
+
+        const attributeKeys = ['health', 'defense', 'power', 'attack-min', 'attack-max', 'damage-min', 'damage-max'];
+        const aiHeroAttributes = attributeKeys.map(attr => aiHero.attributes[attr]?.value || 0);
+
+        const allHabilities = [
+            "Golpe básico", "Golpe con escudo", "Mano de piedra", "Defensa feroz", "Golpe de defensa", "Embate sangriento", 
+            "Lanza de los dioses", "Golpe de tormenta", "Segundo Impulso", "Misiles de magma", "Vulcano", "Pare de fuego", 
+            "Luz cegadora", "Lluvia de hielo", "Cono de hielo", "Bola de hielo", "Frio concentrado", "Flor de loto", 
+            "Agonia", "Piquete", "Toma y lleva", "Cortada", "Machetazo", "Planazo", "Intimidación sangrienta"
+        ];
+
+        const aiHeroHabilitiesBinary = allHabilities.map(hability => 
+            aiHero.products.some(product => product.productName === hability) ? 1 : 0
+        );
+
+        const victimAttributes = attributeKeys.map(attr => victim.attributes[attr]?.value || 0);
+
+        const requestData = [
+            heroTypeBinary,           // Matriz binaria de type y subtype de aiHero
+            aiHeroAttributes,         // Atributos de aiHero
+            aiHeroHabilitiesBinary,   // Habilidades de aiHero
+            victimAttributes          // Atributos de victim
+        ];
+
+        return requestData;
     }
 
     // revisa si el heroe tiene la habilidad, regresa la primera habilidad que tenga
     static filterHabilityByHero(aiHero: IHero, habilities: string[]): string {
-        console.log(aiHero, habilities);
+        for (const product of aiHero.products) 
+            if (habilities.includes(product.productName)) return product.productName;
 
+        // TODO poner aqui la hábilidad base que todos tienen
         return "some_thing"
     }
 }

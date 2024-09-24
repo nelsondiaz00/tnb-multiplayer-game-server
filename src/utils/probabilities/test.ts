@@ -1,6 +1,5 @@
 import { calculateDamage } from './probabilities.js'; 
 
-// Simulación de un héroe para probar
 const hero = {
   'tipo-heroe': 'warrior',
   'subtipo-heroe': 'tank',

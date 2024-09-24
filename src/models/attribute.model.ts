@@ -20,39 +20,12 @@ export class Attribute implements IAttribute {
         this.value = value;
     }
 
-    public getValueConstant(): number {
-        // Getter for valueConstant
-        return this.valueConstant;
-    }
-
-    // set value(val: number) {
-    //     if (val >= 0) {
-    //         this._value = val;
-    //     } else {
-    //         console.error("attribute can't be negative");
-    //     }
-    // }
-
     public clone(): IAttribute {
         return new Attribute(
             this.name,
             this.value,
             this.valueMin,
             this.valueMax
-        );
-    }
-
-    public changeOnValue(): number {
-        return this.value - this.valueConstant;
-    }
-
-    public getValueChangement() {
-        return (
-            this.value +
-            Math.floor(
-                Math.random() * (this.valueMax - this.valueMin + 1) +
-                    this.valueMin
-            )
         );
     }
 }

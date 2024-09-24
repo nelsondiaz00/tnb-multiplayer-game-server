@@ -22,9 +22,10 @@ import { GameSettings } from "../utils/game.settings.js";
 import { Server } from "socket.io";
 import { parentPort } from 'worker_threads';
 import { AIUtil } from "../utils/ai.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-
-const POWER_PER_TURN = 2;
+const POWER_PER_TURN: number = parseInt(process.env['POWER_PER_TURN'] || '2');
 
 export class MatchLoader implements IMatchLoader {
     private match: IMatch;
@@ -142,6 +143,8 @@ export class MatchLoader implements IMatchLoader {
 
     getAiMap(): Map<string, IHero> { return this.aiMap; }
 
+    getHeroMap(): Map<string, IHero> { return this.heroMap; }
+
     private playersInTeam(teamSide: teamSide): number {
         let count = 0;
         this.heroMap.forEach((hero) => {
@@ -180,8 +183,8 @@ export class MatchLoader implements IMatchLoader {
             'subtipo-heroe': perpetrator.subtype.toString(),
             dano: parseInt((perpetrator.attributes["damage"]).toString()),
             critico: parseInt((perpetrator.attributes["critical"]).toString())
-          };
-          
+        };
+
         const damageCaused = parseFloat(calculateDamage(hero).toFixed(1));
 
         logger.info(`${damageCaused} damage caused`)
