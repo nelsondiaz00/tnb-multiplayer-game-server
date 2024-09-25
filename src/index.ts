@@ -83,6 +83,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(3000, 'localhost', () => {
+server.listen(MAIN_SERVER_PORT, HOST, () => {
     console.log(`Server is running on http://${HOST}:${MAIN_SERVER_PORT}`);
 });

@@ -7,7 +7,7 @@ import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 import { Match } from "../models/match.model.js";
 import { Team } from "../models/team.model.js";
 import { NullHero } from "../null_models/null.hero.js";
-import { NullProduct } from "../null_models/null.product.js";
+// import { NullProduct } from "../null_models/null.product.js";
 import { NullTeam } from "../null_models/null.team.js";
 import { calculateDamage } from '../utils/probabilities/probabilities.js';
 import {
@@ -75,11 +75,19 @@ export class MatchLoader implements IMatchLoader {
     }
 
     useHability(perpetratorId: string, productId: string, victimId: string): void {
-        const perpetrator = this.getHero(perpetratorId);
-        const product = this.getProduct(productId);
+        let perpetrator = this.getHeroMap().get(perpetratorId);
+        const product = this.productMap.get(productId);
 
-        if (product == null || perpetrator == null) {
-            logger.error("the perpetrator or the product, someone is null, wtf is this code man.");
+        if (perpetrator == undefined) {
+            perpetrator = this.getAiMap().get(perpetratorId);
+            if (perpetrator == undefined) {
+                logger.error("perpetrator null, wtf is this shite");
+                return;
+            }
+        }
+            
+        if (product == undefined) {
+            logger.error("the product is null, wtf is this code man.");
             return;
         } else if (perpetrator.attributes["power"].value < product.powerCost) {
             logger.error("not enough power? try some perico");
@@ -87,10 +95,13 @@ export class MatchLoader implements IMatchLoader {
             return;
         }
 
-        const victim = this.getHero(victimId);
-        if (victim == null) {
-            logger.error("victim null UnU");
-            return;
+        let victim = this.getHeroMap().get(victimId);
+        if (victim == undefined) {
+            victim = this.getAiMap().get(victimId);
+            if (victim == undefined) {
+                logger.error("victim null UnU");
+                return;
+            }
         }
 
         this.affectPlayerHealth(perpetrator, victim);
@@ -129,14 +140,14 @@ export class MatchLoader implements IMatchLoader {
         if (playersInBlue < GameSettings.getBluePlayers()) {
             logger.info(`adding ${(GameSettings.getBluePlayers() - playersInBlue)} ai's to blue team`);
             for (let i = 0; i < (GameSettings.getBluePlayers() - playersInBlue); i++) {
-                AIUtil.addAiToTeam(this.blueTeam, this.aiMap);
+                AIUtil.addAiToTeam(this.blueTeam, this.aiMap, this.productMap);
             }
         }
 
         if (playersInRed < GameSettings.getRedPlayers()) {
             logger.info(`adding ${(GameSettings.getBluePlayers() - playersInBlue)} ai's to red team`);
             for (let i = 0; i < (GameSettings.getRedPlayers() - playersInRed); i++) {
-                AIUtil.addAiToTeam(this.redTeam, this.aiMap);
+                AIUtil.addAiToTeam(this.redTeam, this.aiMap, this.productMap);
             }
         }
     }
@@ -257,7 +268,7 @@ export class MatchLoader implements IMatchLoader {
 
     private getHero(idHero: string): IHero { return this.heroMap.get(idHero) ?? new NullHero(); }
 
-    private getProduct(idProduct: string): IProduct { return this.productMap.get(idProduct) ?? new NullProduct(); }
+    // private getProduct(idProduct: string): IProduct { return this.productMap.get(idProduct) ?? new NullProduct(); }
 
     private getTeam(idHero: string): ITeam {
         const firstSide = this.teams.get("blue");
