@@ -4956,3 +4956,112 @@
                 Se lo capturaron y lo condenaron.
 2024-09-26T00:28:01.310Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
 >>>>>>> d5e6375d363980938647cfed7460f189c8b90ae7
+2024-09-26T00:31:45.723Z [[32minfo[39m]: Cliente conectado: fPPnTWX66CzpxmDkAAAB
+2024-09-26T00:31:45.763Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:31:45.776Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:31:51.058Z [[32minfo[39m]: Solicitud de nueva partida recibida: [object Object]
+2024-09-26T00:31:51.063Z [[32minfo[39m]: hasta acá debería llegar, no?
+2024-09-26T00:31:51.522Z [[31merror[39m]: Match on port 3001 encountered an error: SyntaxError: Unexpected identifier 'assert'
+2024-09-26T00:31:51.527Z [[32minfo[39m]: Match on port 3001 exited with code 1
+2024-09-26T00:32:30.553Z [[32minfo[39m]: Solicitud de nueva partida recibida: [object Object]
+2024-09-26T00:32:30.556Z [[32minfo[39m]: hasta acá debería llegar, no?
+2024-09-26T00:32:30.939Z [[31merror[39m]: Match on port 3002 encountered an error: SyntaxError: Unexpected identifier 'assert'
+2024-09-26T00:32:30.949Z [[32minfo[39m]: Match on port 3002 exited with code 1
+2024-09-26T00:37:38.703Z [[32minfo[39m]: Cliente conectado: U1aKTGkUoWVJ1EgJAAAB
+2024-09-26T00:37:38.714Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:37:38.716Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:37:42.310Z [[32minfo[39m]: Solicitud de nueva partida recibida: [object Object]
+2024-09-26T00:37:42.315Z [[32minfo[39m]: hasta acá debería llegar, no?
+2024-09-26T00:37:42.578Z [[31merror[39m]: Match on port 3001 encountered an error: SyntaxError: Unexpected identifier 'assert'
+2024-09-26T00:37:42.581Z [[32minfo[39m]: Match on port 3001 exited with code 1
+2024-09-26T00:54:52.671Z [[32minfo[39m]: Cliente conectado: O_DfPOqpNHgZFWWLAAAB
+2024-09-26T00:54:56.247Z [[32minfo[39m]: Cliente conectado: OuTlc0jfEZ6e5pkWAAAD
+2024-09-26T00:54:56.273Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:54:56.283Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:54:59.877Z [[32minfo[39m]: Solicitud de nueva partida recibida: [object Object]
+2024-09-26T00:54:59.882Z [[32minfo[39m]: hasta acá debería llegar, no?
+2024-09-26T00:55:01.455Z [[32minfo[39m] (Thread: 2): Match running on port 3001
+2024-09-26T00:55:06.324Z [[32minfo[39m]: Match on port 3001 says: [object Object]
+2024-09-26T00:55:06.326Z [[32minfo[39m]: 0  sí entró
+2024-09-26T00:55:06.426Z [[32minfo[39m] (Thread: 2): a user has connected!
+2024-09-26T00:55:08.313Z [[32minfo[39m] (Thread: 2): emited [object Object]
+2024-09-26T00:55:40.970Z [[32minfo[39m]: Cliente conectado: tNFIjWCpCaETQh7TAAAF
+2024-09-26T00:55:41.003Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:55:41.006Z [[32minfo[39m]: Solicitud para obtener partidas activas recibida.
+2024-09-26T00:55:42.603Z [[32minfo[39m]: Match on port 3001 says: [object Object]
+2024-09-26T00:55:42.604Z [[32minfo[39m]: 1  sí entró
+2024-09-26T00:55:42.682Z [[32minfo[39m] (Thread: 2): a user has connected!
+2024-09-26T00:55:45.323Z [[32minfo[39m] (Thread: 2): emited [object Object]
+2024-09-26T00:55:47.682Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:55:51.173Z [[32minfo[39m] (Thread: 2): 0 damage caused
+2024-09-26T00:55:51.173Z [[32minfo[39m] (Thread: 2): perpetrator doesn't hit, victim still alive
+2024-09-26T00:55:51.174Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:55:51.177Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:55:54.749Z [[32minfo[39m] (Thread: 2): 3 damage caused
+2024-09-26T00:55:54.750Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:55:54.750Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:55:54.751Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:55:58.315Z [[32minfo[39m] (Thread: 2): 3 damage caused
+2024-09-26T00:55:58.316Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:55:58.316Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:55:58.319Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:02.616Z [[32minfo[39m] (Thread: 2): 0 damage caused
+2024-09-26T00:56:02.617Z [[32minfo[39m] (Thread: 2): perpetrator doesn't hit, victim still alive
+2024-09-26T00:56:02.617Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:02.621Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:56:06.012Z [[32minfo[39m] (Thread: 2): 5 damage caused
+2024-09-26T00:56:06.013Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:56:06.013Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:06.015Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:09.185Z [[32minfo[39m] (Thread: 2): 1 damage caused
+2024-09-26T00:56:09.186Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:56:09.186Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:09.187Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:56:12.814Z [[32minfo[39m] (Thread: 2): 6 damage caused
+2024-09-26T00:56:12.814Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:56:12.814Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:12.816Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:15.945Z [[32minfo[39m] (Thread: 2): 5 damage caused
+2024-09-26T00:56:15.945Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:56:15.946Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:15.948Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:56:19.744Z [[32minfo[39m] (Thread: 2): 0 damage caused
+2024-09-26T00:56:19.744Z [[32minfo[39m] (Thread: 2): perpetrator doesn't hit, victim still alive
+2024-09-26T00:56:19.745Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:19.746Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:24.747Z [[32minfo[39m] (Thread: 2): Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.
+2024-09-26T00:56:24.748Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:56:29.749Z [[32minfo[39m] (Thread: 2): Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.
+2024-09-26T00:56:29.751Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:34.752Z [[32minfo[39m] (Thread: 2): Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.
+2024-09-26T00:56:34.754Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:56:35.034Z [[32minfo[39m] (Thread: 2): 2 damage caused
+2024-09-26T00:56:35.035Z [[32minfo[39m] (Thread: 2): perpetrator hits!, victim still alive
+2024-09-26T00:56:35.035Z [[32minfo[39m] (Thread: 2): perpetrator used power, remaining power: 8
+2024-09-26T00:56:35.037Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:40.037Z [[32minfo[39m] (Thread: 2): Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.
+2024-09-26T00:56:40.039Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
+2024-09-26T00:56:43.359Z [[32minfo[39m] (Thread: 2): The user rSr-UZpd5exyH2qkAAAB has disconnected.
+2024-09-26T00:56:45.040Z [[32minfo[39m] (Thread: 2): Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.
+2024-09-26T00:56:45.041Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Javier, Side: red
+2024-09-26T00:56:46.628Z [[32minfo[39m] (Thread: 2): The user fIyx4Nqi05juB0QTAAAD has disconnected.
+2024-09-26T00:56:50.042Z [[32minfo[39m] (Thread: 2): Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.
+2024-09-26T00:56:50.042Z [[32minfo[39m] (Thread: 2): Turno del héroe con ID: Nelson, Side: blue
