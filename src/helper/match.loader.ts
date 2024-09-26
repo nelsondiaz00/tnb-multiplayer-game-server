@@ -231,6 +231,22 @@ export class MatchLoader implements IMatchLoader {
         }
     }
 
+    public getTeamState(victim: IHero): void {
+        const victimTeam = this.getTeam(victim.idUser);
+        if (victimTeam == null) {
+            logger.error("victimTeam null :))))");
+            return;
+        }
+
+        victimTeam.teamSide === "blue" ? GameSettings.addBlueDead() : GameSettings.addRedDead();
+        if (!GameSettings.blueAlive || !GameSettings.redAlive) {
+            victimTeam.alive = false;
+            this.endMatch(victim.teamSide === "blue" ? "red" : "blue");
+            logger.info("x.x");
+            return;
+        }
+    }
+
     getTeamWeakest(teamSide: teamSide): IHero {
         const team = this.teams.get(teamSide);
 
@@ -308,9 +324,11 @@ export class MatchLoader implements IMatchLoader {
         }
     }
 
-    private endMatch(teamSide: teamSide) {
+    public endMatch(teamSide: teamSide) {
         if (parentPort) {
             parentPort.postMessage({ status: "Match ended.", winner: teamSide })
+            // const match = Array.from(activeMatches).find(match => match.port === port);
+
         }
         this.io.emit("endMatch", teamSide);
 

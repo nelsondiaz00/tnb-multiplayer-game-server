@@ -139,6 +139,8 @@ export class Turns implements ITurns {
             const hero = this.matchLoader.getHeroMap().get(idUser);
             if (hero) {
                 hero.alive = false;
+                hero.attributes["blood"].value = 0;
+                this.matchLoader.getTeamState(hero);
             } else {
                 const aiHero = this.matchLoader.getAiMap().get(idUser);
                 for (let [key, value] of this.matchLoader.getAiMap().entries()) 
