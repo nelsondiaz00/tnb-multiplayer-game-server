@@ -112,14 +112,18 @@ export class MatchLoader implements IMatchLoader {
     getMatch(): IMatch { return this.match; }
 
     givePower(heroId: string) {
-        const hero = this.heroMap.get(heroId);
+        let hero = this.getHeroMap().get(heroId);
         if (hero == undefined) {
-            console.error("paila mani no le puedo dar power porque el heroe ni existe en esta partida.");
-            return;
+            hero = this.aiMap.get(heroId);
+
+            if (hero == undefined) {
+                logger.error("paila mani no le puedo dar power porque el heroe ni existe en esta partida.");
+                return;
+            }
         }
-        if(hero.attributes["power"].value + POWER_PER_TURN <= hero.attributes["power"].valueConstant) {
+
+        if (hero.attributes["power"].value + POWER_PER_TURN <= hero.attributes["power"].valueConstant)
             hero.attributes["power"].value += POWER_PER_TURN;
-        }
     }
 
     getSerializedMatch(): unknown {

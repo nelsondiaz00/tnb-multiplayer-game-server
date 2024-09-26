@@ -64,7 +64,6 @@ export class AIUtil {
 
     static callAiAPI(aiHero: IHero, victim: IHero): Promise<string> {
         const params = this.parseToApi(aiHero, victim);
-        logger.info(`Solicitud enviada a la API de IA ${JSON.stringify(params)}`);
 
         async function sendRequest(): Promise<string> {
             try {
@@ -76,12 +75,8 @@ export class AIUtil {
                     body: JSON.stringify(params)
                 });
 
-                logger.info(`Solicitud enviada a la API de IA ${JSON.stringify(params)}`);
-
                 if (response.ok) {
                     const data = await response.json(); 
-                    logger.info(`Habilidades recibidas: ${data}`);
-
                     return AIUtil.filterHabilityByHero(aiHero, data);
                 } else {
                     logger.error(`Error en la solicitud: ${response.status}, ${response.statusText}`);
