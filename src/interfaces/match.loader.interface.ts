@@ -14,5 +14,7 @@ export interface IMatchLoader {
     getAiMap(): Map<string, IHero>;
     getTeamWeakest(teamSide: teamSide): IHero;
     getHeroMap(): Map<string, IHero>;
+    endMatch(teamSide: teamSide): void;
+    getTeamState(victim: IHero): void;
     //getHero(idHero: string): IHero;
 }
