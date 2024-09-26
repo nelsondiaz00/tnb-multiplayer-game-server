@@ -118,7 +118,8 @@ export class Turns implements ITurns {
             AIUtil.callAiAPI(aiHero, victim).then((idHability: string) => {
                 if (idHability === "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") this.callNextTurn();
                 else {
-                    this.matchLoader.useHability(aiHero!.idUser, idHability, victim.idUser);
+                    logger.info(`AI Hero with id ${aiHero.idUser} used hability with id ${idHability}`);
+                    this.matchLoader.useHability(aiHero.idUser, idHability, victim.idUser);
                     this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
                 }
             }).catch((error) => {
@@ -128,13 +129,27 @@ export class Turns implements ITurns {
         } else this.callNextTurn();
     }
 
-    private handleTurnTimeout(idUser: string) {
-        logger.info(
-            `Todas las mañanas veo una ancianita
-            Muy desesperada preguntando por su hijo
-            Pero ella no sabe que fue reo AUSENTE
-            Se lo capturaron y lo condenaron.`);
-        this.wasTurnPassedDueToTimeout = false;
-        this.matchLoader.getHeroMap().get(idUser)!.alive = false;
-    }
+        private handleTurnTimeout(idUser: string) {
+            logger.info(
+                `Todas las mañanas veo una ancianita
+                Muy desesperada preguntando por su hijo
+                Pero ella no sabe que fue reo AUSENTE
+                Se lo capturaron y lo condenaron.`);
+            this.wasTurnPassedDueToTimeout = false;
+            const hero = this.matchLoader.getHeroMap().get(idUser);
+            if (hero) {
+                hero.alive = false;
+            } else {
+                const aiHero = this.matchLoader.getAiMap().get(idUser);
+                for (let [key, value] of this.matchLoader.getAiMap().entries()) 
+                    console.log(`Key: ${key}, Value: ${value}`);
+                for (let [key, value] of this.matchLoader.getHeroMap().entries()) 
+                    console.log(`Key: ${key}, Value: ${value}`);
+                if (aiHero) {
+                    aiHero.alive = false;
+                } else{         
+                    logger.error(`Hero with id ${idUser} not found in hero map!`);
+                }
+            }
+        }
 }
