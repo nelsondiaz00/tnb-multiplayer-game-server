@@ -123,7 +123,6 @@ export class AIUtil {
 
     // revisa si el heroe tiene la habilidad, regresa la primera habilidad que tenga
     static filterHabilityByHero(aiHero: IHero, habilities: string[]): string {
-        logger.info(`Habilidades recibidas: ${habilities}`);
         for (const hability of habilities)
             for (const product of aiHero.products) 
                 if (product.productName === hability) return product.idProduct;
