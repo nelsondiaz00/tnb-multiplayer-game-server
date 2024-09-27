@@ -1,15 +1,15 @@
-import { IAttribute } from "../interfaces/attribute.interfaces";
-import { IHero } from "../interfaces/hero.interfaces";
-import { ITeam } from "../interfaces/team.interface";
-import { Hero } from "../models/hero.model";
-import { heroType, subHeroType } from "../types/hero.type";
+import { IAttribute } from "../interfaces/attribute.interfaces.js";
+import { IHero } from "../interfaces/hero.interfaces.js";
+import { ITeam } from "../interfaces/team.interface.js";
+import { Hero } from "../models/hero.model.js";
+import { heroType, subHeroType } from "../types/hero.type.js";
 import dotenv from 'dotenv';
-import logger from "./logger";
-import * as npcs from '../assets/ia-templates/npcs.json';
-import { IProduct } from "../interfaces/product.interfaces";
+import logger from "./logger.js";
+import npcs from '../assets/ia-templates/npcs.json' assert { type: 'json' };
+import { IProduct } from "../interfaces/product.interfaces.js";
 dotenv.config();
 
-const url = process.env.API_URL;
+const url: string = process.env.API_URL || 'http://127.0.0.1:5000/api/ai/habilities';
 
 export class AIUtil {
     static convertToAttribute(attribute: any): IAttribute {
@@ -25,7 +25,7 @@ export class AIUtil {
         };
     }
 
-    static addAiToTeam(team: ITeam, aiMap: Map<string, IHero>): void {
+    static addAiToTeam(team: ITeam, aiMap: Map<string, IHero>, productsMatch: Map<string, IProduct>): void {
         const npcHeroes = Object.values(npcs);
 
         const randomIndex = Math.floor(Math.random() * npcHeroes.length);
@@ -52,9 +52,14 @@ export class AIUtil {
 
         team.addHero(newAiHero);
 
-        aiMap.set(randomNpc.idUser, newAiHero);
+        aiMap.set(uniqueId, newAiHero);
 
-        logger.info(`AI Hero added to ${team.teamSide} team with id: ${randomNpc.idUser}`);
+        newAiHero.products.forEach((product) => {
+            if (productsMatch.get(product.idProduct) == undefined)
+                productsMatch.set(product.idProduct, product);
+        });
+
+        logger.info(`AI Hero added to ${team.teamSide} team with id: ${uniqueId}`);
     }
 
     static callAiAPI(aiHero: IHero, victim: IHero): Promise<string> {
@@ -62,7 +67,7 @@ export class AIUtil {
 
         async function sendRequest(): Promise<string> {
             try {
-                const response = await fetch(url as string, {
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -72,8 +77,6 @@ export class AIUtil {
 
                 if (response.ok) {
                     const data = await response.json(); 
-                    logger.info(`Habilidades recibidas: ${data}`);
-
                     return AIUtil.filterHabilityByHero(aiHero, data);
                 } else {
                     logger.error(`Error en la solicitud: ${response.status}, ${response.statusText}`);
@@ -120,10 +123,11 @@ export class AIUtil {
 
     // revisa si el heroe tiene la habilidad, regresa la primera habilidad que tenga
     static filterHabilityByHero(aiHero: IHero, habilities: string[]): string {
-        for (const product of aiHero.products) 
-            if (habilities.includes(product.productName)) return product.productName;
+        for (const hability of habilities)
+            for (const product of aiHero.products) 
+                if (product.productName === hability) return product.idProduct;
 
         // TODO poner aqui la hábilidad base que todos tienen
-        return "some_thing"
+        return "20";
     }
 }

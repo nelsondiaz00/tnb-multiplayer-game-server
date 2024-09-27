@@ -47,6 +47,24 @@ io.on("connection", (socket) => {
         socket.emit("matchDetails", { port: matchPort });
 
         worker.on("message", (msg) => {
+                if (msg.status === "MatchEnded") {
+                    const { winner } = msg;
+
+                    io.emit("endMatch", { winner });
+
+                    activeMatches.forEach((match) => {
+                        if (match.port === matchPort) activeMatches.delete(match);
+                    });
+
+                    workers.delete(matchPort);
+
+                    worker.terminate().then(() => { logger.info(`Match on port ${matchPort} terminated successfully.`); })
+                    .catch((err) => { logger.error(`Failed to terminate match on port ${matchPort}: ${err}`); });
+                } else {
+                    // TODO preguntarle a nelson si usa esta vaina de matchWinner que no creo wth
+                    socket.emit("matchWinner", msg);
+                }
+
             logger.info(`Match on port ${matchPort} says: ${msg}`);
             socket.emit("matchWinner", msg);
         });
@@ -83,6 +101,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(3000, 'localhost', () => {
+server.listen(MAIN_SERVER_PORT, HOST, () => {
     console.log(`Server is running on http://${HOST}:${MAIN_SERVER_PORT}`);
 });

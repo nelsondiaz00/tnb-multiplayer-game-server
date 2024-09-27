@@ -1,7 +1,7 @@
 {
   "heroe1": {
     "teamSide": "red",
-    "idUser": "user9",
+    "idUser": "user0",
     "type": "warrior",
     "subtype": "tank",
     "attributes": {
@@ -21,7 +21,7 @@
       },
       "power": {
         "name": "power",
-        "value": 10,
+        "value": 40,
         "valueMin": 0,
         "valueMax": 0,
         "valueConstant": 0
@@ -149,7 +149,7 @@
   },
   "heroe2": {
     "teamSide": "red",
-    "idUser": "user9",
+    "idUser": "user1",
     "type": "warrior",
     "subtype": "weapon",
     "attributes": {
