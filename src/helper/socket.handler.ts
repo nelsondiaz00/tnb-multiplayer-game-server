@@ -40,9 +40,9 @@ export class SocketHandler {
         else logger.info("pailangas tangas al intentar iniciar la batalla");
     }
 
-    private handleUseHability(perpetratorId: string, productId: string, victimId: string): void {
+    private async handleUseHability(perpetratorId: string, productId: string, victimId: string): Promise<void> {
         this.io.emit("lastAttackName", {perpetratorId: perpetratorId, victimId: victimId});
-        this.matchLoader.useHability(perpetratorId, productId, victimId);
+        await this.matchLoader.useHability(perpetratorId, productId, victimId);
         this.io.emit("actualMatch", this.matchLoader.getSerializedMatch());
     }
 }
