@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const TURN_DURATION_MS: number = parseInt(process.env['TURN_DURATION_MS'] || '180000');
+const MAX_AI_WAIT: number = parseInt(process.env['MAX_AI_WAIT'] || '3000');
 
 export class Turns implements ITurns {
     private rotationStarted: boolean = false;
@@ -63,8 +64,11 @@ export class Turns implements ITurns {
 
         const nextTurn = () => {
             const currentUser: ITurn = this.circularList[index];
+            logger.info(`Current turn is ${currentUser.idUser} and side ${currentUser.side}`);
             const previousIndex = (index - 1 + this.circularList.length) % this.circularList.length;
             if (this.wasTurnPassedDueToTimeout) this.handleTurnTimeout(this.circularList[previousIndex].idUser);
+
+            if (this.validateCurrentUser(currentUser.idUser)) this.callNextTurn();
 
             this.turnNotifier.notifyTurn(currentUser, this.matchLoader.getSerializedMatch());
 
@@ -110,48 +114,66 @@ export class Turns implements ITurns {
                     this.matchLoader.givePower(redHeroes[i].idUser);
     }
 
-    private execAILogic(aiHero: IHero): void {
-        let isAiAlive: boolean = aiHero.alive;
-        if (isAiAlive) {
-            let victim: IHero = this.matchLoader.getTeamWeakest(aiHero.teamSide === "blue" ? "red" : "blue");
+    private async execAILogic(aiHero: IHero): Promise<void> {
+        let victim: IHero = this.matchLoader.getTeamWeakest(aiHero.teamSide === "blue" ? "red" : "blue");
 
-            AIUtil.callAiAPI(aiHero, victim).then((idHability: string) => {
-                if (idHability === "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") this.callNextTurn();
-                else {
-                    logger.info(`AI Hero with id ${aiHero.idUser} used hability with id ${idHability}`);
-                    this.matchLoader.useHability(aiHero.idUser, idHability, victim.idUser);
-                    this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
-                }
-            }).catch((error) => {
-                logger.error(`Error al llamar a la API de IA: ${error}`);
-                this.callNextTurn();
-            });
-        } else this.callNextTurn();
+        try {
+            const idHability = await AIUtil.callAiAPI(aiHero, victim);
+
+            if (idHability !== "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") {
+                logger.info(`AI Hero with id ${aiHero.idUser} used hability with id ${idHability}`);
+                await this.waitRandomTime();
+                this.matchLoader.useHability(aiHero.idUser, idHability, victim.idUser);
+            }
+        } catch (error) { logger.error(`Error al llamar a la API de IA: ${error}`); }
+
+        this.callNextTurn();
+        this.turnNotifier.emitMatch(this.matchLoader.getSerializedMatch());
     }
 
-        private handleTurnTimeout(idUser: string) {
-            logger.info(
-                `Todas las mañanas veo una ancianita
-                Muy desesperada preguntando por su hijo
-                Pero ella no sabe que fue reo AUSENTE
-                Se lo capturaron y lo condenaron.`);
-            this.wasTurnPassedDueToTimeout = false;
-            const hero = this.matchLoader.getHeroMap().get(idUser);
-            if (hero) {
-                hero.alive = false;
-                hero.attributes["blood"].value = 0;
-                this.matchLoader.getTeamState(hero);
-            } else {
-                const aiHero = this.matchLoader.getAiMap().get(idUser);
-                for (let [key, value] of this.matchLoader.getAiMap().entries()) 
-                    console.log(`Key: ${key}, Value: ${value}`);
-                for (let [key, value] of this.matchLoader.getHeroMap().entries()) 
-                    console.log(`Key: ${key}, Value: ${value}`);
-                if (aiHero) {
-                    aiHero.alive = false;
-                } else{         
-                    logger.error(`Hero with id ${idUser} not found in hero map!`);
-                }
+    private handleTurnTimeout(idUser: string) {
+        logger.info(
+            `Todas las mañanas veo una ancianita
+            Muy desesperada preguntando por su hijo
+            Pero ella no sabe que fue reo AUSENTE
+            Se lo capturaron y lo condenaron.`);
+        this.wasTurnPassedDueToTimeout = false;
+        const hero = this.matchLoader.getHeroMap().get(idUser);
+        if (hero) {
+            hero.attributes["blood"].value = 0;
+            hero.alive = false;
+            this.matchLoader.getTeamState(hero);
+        } else {
+            const aiHero = this.matchLoader.getAiMap().get(idUser);
+            if (aiHero) {
+                aiHero.attributes["blood"].value = 0;
+                aiHero.alive = false;
+            } else  logger.error(`Hero with id ${idUser} not found in hero map!`);
+        }
+    }
+
+    private waitRandomTime(min: number = 1500, max: number = MAX_AI_WAIT): Promise<void> {
+        const randomTime = Math.floor(Math.random() * (max - min + 1)) + min;
+        return new Promise((resolve) => setTimeout(resolve, randomTime));
+    }
+
+    private validateCurrentUser(idUser: string): boolean {
+        let hero = this.matchLoader.getHeroMap().get(idUser);
+        if (hero == undefined) {
+            hero = this.matchLoader.getAiMap().get(idUser);
+            if (hero == undefined) {
+                logger.error(`poder decir adios, es crecer, esto esta muy raro, 
+                    como asi que no encuentra le heroe, entonces de donde
+                    se saco el id? del culo depronto`);
+                return false;
             }
         }
+
+        if (!hero.alive) {
+            this.circularList = this.circularList.filter(turn => turn.idUser !== hero.idUser);
+            logger.info(`pa fuera porque esta muerto`);
+            return true;
+        } else logger.error(`else:)`);
+        return false;
+    }
 }
