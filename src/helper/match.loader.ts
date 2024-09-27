@@ -9,7 +9,7 @@ import { Team } from "../models/team.model.js";
 import { NullHero } from "../null_models/null.hero.js";
 // import { NullProduct } from "../null_models/null.product.js";
 import { NullTeam } from "../null_models/null.team.js";
-import { calculateDamage } from '../utils/probabilities/probabilities.js';
+// import { calculateDamage } from '../utils/probabilities/probabilities.js';
 import {
     AdditionStrategy,
     EffectStrategy,
@@ -23,9 +23,12 @@ import { Server } from "socket.io";
 import { parentPort } from 'worker_threads';
 import { AIUtil } from "../utils/ai.js";
 import dotenv from "dotenv";
+import { heroType, subHeroType } from "../types/hero.type.js";
 dotenv.config();
 
 const POWER_PER_TURN: number = parseInt(process.env['POWER_PER_TURN'] || '2');
+const url: string = process.env.API_URL || 'http://127.0.0.1:5000/api/calculate/damage';
+
 
 export class MatchLoader implements IMatchLoader {
     private match: IMatch;
@@ -74,7 +77,29 @@ export class MatchLoader implements IMatchLoader {
         });
     }
 
-    useHability(perpetratorId: string, productId: string, victimId: string): void {
+    private translateHero(hero: heroType, subHero: subHeroType): any {
+        const heroTranslations: Record<heroType, string> = {
+          warrior: 'GUERRERO',
+          wizard: 'MAGO',
+          rogue: 'PÍCARO',
+        };
+      
+        const subHeroTranslations: Record<subHeroType, string> = {
+          tank: 'TANQUE',
+          weapon: 'ARMA',
+          fire: 'FUEGO',
+          ice: 'HIELO',
+          poison: 'VENENO',
+          machete: 'MACHETE',
+        };
+      
+        return {
+          type: heroTranslations[hero],
+          subType: subHeroTranslations[subHero],
+        };
+      }
+
+    async useHability(perpetratorId: string, productId: string, victimId: string): Promise<void> {
         let perpetrator = this.getHeroMap().get(perpetratorId);
         const product = this.productMap.get(productId);
 
@@ -104,7 +129,7 @@ export class MatchLoader implements IMatchLoader {
             }
         }
 
-        this.affectPlayerHealth(perpetrator, victim);
+        await this.affectPlayerHealth(perpetrator, victim);
         this.affectSkills(perpetratorId, product, victimId);
         this.affectPlayerPower(perpetrator, product);
     }
@@ -166,6 +191,27 @@ export class MatchLoader implements IMatchLoader {
         return count;
     }
 
+    private async callProbalitiesAPI(heroProbabilities: HeroStats): Promise<number> {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(heroProbabilities)
+        });
+
+        logger.info(`Solicitud enviada a la API de IA ${JSON.stringify(heroProbabilities)}`);
+        if (response.ok) {
+            const data = await response.json(); 
+            logger.info(`Daño infligido!: ${data}`);
+
+            return data;
+        } else {
+            logger.error(`Error en la solicitud: ${response.status}, ${response.statusText}`);
+            return 0;
+        }
+    }
+
     private affectSkills(perpetratorId: string, product: IProduct, victimId: string): void {
         const perpetratorSide: ITeam = this.getTeam(perpetratorId);
         const victimSide: ITeam = this.getTeam(victimId);
@@ -182,23 +228,34 @@ export class MatchLoader implements IMatchLoader {
         });
     }
 
-    private affectPlayerHealth(perpetrator: IHero, victim: IHero): void {
+    private async affectPlayerHealth(perpetrator: IHero, victim: IHero): Promise<void> {
         if (perpetrator.attributes["attack"].value < victim.attributes["defense"].value) {
             logger.info("victim so tanky, no damage taken");
             this.io.emit("failedReason", "¡Fallo! Enemigo muy tanque");
             return;
         }
 
-        const hero = {
-            'tipo-heroe': perpetrator.type.toString(),
-            'subtipo-heroe': perpetrator.subtype.toString(),
-            dano: parseInt((perpetrator.attributes["damage"]).toString()),
-            critico: parseInt((perpetrator.attributes["critical"]).toString())
+        // const hero = {
+        //     'tipo-heroe': perpetrator.type.toString(),
+        //     'subtipo-heroe': perpetrator.subtype.toString(),
+        //     dano: parseInt((perpetrator.attributes["damage"]).toString()),
+        //     critico: parseInt((perpetrator.attributes["critical"]).toString())
+        // };
+
+        
+
+       // const damageCaused = parseFloat(calculateDamage(hero).toFixed(1));
+       const translateHero = this.translateHero(perpetrator.type, perpetrator.subtype);
+        const heroProbabilities: HeroStats = {
+            critico: perpetrator.attributes["critical"].value,
+            dano: perpetrator.attributes["damage"].value,
+            'tipo-heroe': translateHero.type,
+            'subtipo-heroe': translateHero.subType
         };
+        logger.info(`Hero probabilities???: ${JSON.stringify(heroProbabilities)}`);
+        const damageCaused = await this.callProbalitiesAPI(heroProbabilities);
 
-        const damageCaused = parseFloat(calculateDamage(hero).toFixed(1));
-
-        logger.info(`${damageCaused} damage caused`)
+        // logger.info(`${damageCaused} damage caused`)
 
         if(damageCaused === 0){
             logger.info("perpetrator doesn't hit, victim still alive");
