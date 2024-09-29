@@ -1,0 +1,27 @@
+{
+    "recompensas": {
+      "dia_1": {
+        "oro": 100,
+        "pocion_curacion": 1
+      },
+      "dia_2": {
+        "oro": 200,
+        "espada": 1
+      },
+      "dia_3": {
+        "oro": 300,
+        "escudo": 1
+      },
+      "dia_7": {
+        "oro": 500,
+        "armadura": 1
+      }
+    },
+    "recompensa_maxima_semanal": {
+      "oro": 1000,
+      "titulo": "Campeón de la Semana"
+    },
+    "dias_consecutivos_requeridos": 7,
+    "reset_recompensas_cada_semana": true
+  }
+  

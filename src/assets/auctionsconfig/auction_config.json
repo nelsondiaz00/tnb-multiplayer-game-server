@@ -1,0 +1,14 @@
+{
+    "duracion_subasta_horas": 24,
+    "incremento_minimo": 10,
+    "moneda": "oro",
+    "comision_por_venta": 0.05,
+    "cantidad_maxima_ofertas": 50,
+    "tipo_subasta": "inglesa",
+    "participantes_minimos": 2,
+    "notificaciones": {
+      "recordatorio_tiempo_limite": true,
+      "ganador_subasta": true
+    }
+  }
+  
