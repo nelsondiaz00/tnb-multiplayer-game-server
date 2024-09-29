@@ -14,6 +14,7 @@ export class Hero implements IHero {
     public products: IProduct[];
     public alive: boolean;
     public teamSide: teamSide;
+    public credits: number;//creditos para subasta
 
     constructor(
         idUser: string,
@@ -21,7 +22,7 @@ export class Hero implements IHero {
         subtype: subHeroType,
         attributesArray: IAttribute[],
         products: IProduct[],
-        teamSide: teamSide
+        teamSide: teamSide,credits: number//Agregue número al constructor
     ) { 
         this.idUser = idUser;
         this.type = type;
@@ -32,6 +33,7 @@ export class Hero implements IHero {
         this.products = products;
         this.alive = true;
         this.teamSide = teamSide;
+        this.credits = credits;//Agregue creditos
     }
 
     isNull(): boolean { return false; }
@@ -46,5 +48,22 @@ export class Hero implements IHero {
             },
             {} as { [key: string]: Attribute },
         );
+    }
+
+    //Metodos referentes al manejo de los creditos
+    hasSufficientCredits(betAmount: number): boolean {
+        return this.credits >= betAmount;
+    }
+
+    // Método para deducir los créditos del jugador
+    deductCredits(betAmount: number): void {
+        if (this.hasSufficientCredits(betAmount)) {
+            this.credits -= betAmount;
+        }
+    }
+
+    // Método para agregar créditos (cuando gana)
+    addCredits(credits: number): void {
+        this.credits += credits;
     }
 }
