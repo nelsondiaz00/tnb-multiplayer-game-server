@@ -12,7 +12,7 @@ export interface IMatchLoader {
     getOwner(): string;
     loadAI(): void;
     getAiMap(): Map<string, IHero>;
-    getTeamWeakest(teamSide: teamSide): IHero;
+    getTeamWeakest(teamSide: teamSide): IHero | null;
     getHeroMap(): Map<string, IHero>;
     endMatch(teamSide: teamSide): void;
     getTeamState(victim: IHero): void;

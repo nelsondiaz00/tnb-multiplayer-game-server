@@ -115,7 +115,11 @@ export class Turns implements ITurns {
     }
 
     private async execAILogic(aiHero: IHero): Promise<void> {
-        let victim: IHero = this.matchLoader.getTeamWeakest(aiHero.teamSide === "blue" ? "red" : "blue");
+        let victim = this.matchLoader.getTeamWeakest(aiHero.teamSide === "blue" ? "red" : "blue");
+        if (victim == null) {
+            logger.error(`victim null :/`);
+            return;
+        }
 
         try {
             const idHability = await AIUtil.callAiAPI(aiHero, victim);
@@ -173,7 +177,7 @@ export class Turns implements ITurns {
             this.circularList = this.circularList.filter(turn => turn.idUser !== hero.idUser);
             logger.info(`pa fuera porque esta muerto`);
             return true;
-        } else logger.error(`else:)`);
+        }
         return false;
     }
 }

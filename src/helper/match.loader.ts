@@ -6,9 +6,9 @@ import { ITeam } from "../interfaces/team.interface.js";
 import { IMatchLoader } from "../interfaces/match.loader.interface.js";
 import { Match } from "../models/match.model.js";
 import { Team } from "../models/team.model.js";
-import { NullHero } from "../null_models/null.hero.js";
+//import { NullHero } from "../null_models/null.hero.js";
 // import { NullProduct } from "../null_models/null.product.js";
-import { NullTeam } from "../null_models/null.team.js";
+//import { NullTeam } from "../null_models/null.team.js";
 import { calculateDamage } from '../utils/probabilities/probabilities.js';
 import {
     AdditionStrategy,
@@ -173,8 +173,8 @@ export class MatchLoader implements IMatchLoader {
     }
 
     private affectSkills(perpetratorId: string, product: IProduct, victimId: string): void {
-        const perpetratorSide: ITeam = this.getTeam(perpetratorId);
-        const victimSide: ITeam = this.getTeam(victimId);
+        const perpetratorSide = this.getTeam(perpetratorId);
+        const victimSide = this.getTeam(victimId);
 
         if (perpetratorSide == null || victimSide == null) {
             logger.error("the perpetratorTeam or the victimTeam, someone is null, but who can be?? Its sherlock time");
@@ -253,18 +253,18 @@ export class MatchLoader implements IMatchLoader {
         }
     }
 
-    getTeamWeakest(teamSide: teamSide): IHero {
+    getTeamWeakest(teamSide: teamSide): IHero | null {
         const team = this.teams.get(teamSide);
         if (!team) {
             logger.error(`Team ${teamSide} not found`);
-            return new NullHero();
+            return null;
         }
 
         let weakestHero: IHero = team.players[0];
 
         for (const hero of team.players) {
             const bloodValue: number = hero.attributes['blood'].value;
-            if (bloodValue < weakestHero.attributes['blood'].value) weakestHero = hero;
+            if (bloodValue < weakestHero.attributes['blood'].value && bloodValue > 0) weakestHero = hero;
         }
 
         return weakestHero;
@@ -282,20 +282,20 @@ export class MatchLoader implements IMatchLoader {
 
     // private getProduct(idProduct: string): IProduct { return this.productMap.get(idProduct) ?? new NullProduct(); }
 
-    private getTeam(idHero: string): ITeam {
+    private getTeam(idHero: string): ITeam | null {
         const firstSide = this.teams.get("blue");
-        if (firstSide == null) return new NullTeam();
+        if (firstSide == null) return null;
 
         for (const player of firstSide.players)
             if (player.idUser == idHero) return firstSide;
 
         const secondSide = this.teams.get("red");
-        if (secondSide == null) return new NullTeam();
+        if (secondSide == null) return null;
 
         for (const player of secondSide.players)
             if (player.idUser == idHero) return secondSide;
 
-        return new NullTeam();
+        return null;
     }
 
     private affectTeam(side: ITeam, effect: IEffect): void {
