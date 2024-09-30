@@ -41,7 +41,6 @@ export class SocketHandler {
     }
 
     private async handleUseHability(perpetratorId: string, productId: string, victimId: string): Promise<void> {
-        this.io.emit("lastAttackName", {perpetratorId: perpetratorId, victimId: victimId});
         await this.matchLoader.useHability(perpetratorId, productId, victimId);
         this.io.emit("actualMatch", this.matchLoader.getSerializedMatch());
     }

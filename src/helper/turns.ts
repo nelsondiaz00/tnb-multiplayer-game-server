@@ -123,7 +123,7 @@ export class Turns implements ITurns {
             if (idHability !== "pailaLaApiNoRespondioPaseTurnoPorqueQueMas") {
                 logger.info(`AI Hero with id ${aiHero.idUser} used hability with id ${idHability}`);
                 await this.waitRandomTime();
-                this.matchLoader.useHability(aiHero.idUser, idHability, victim.idUser);
+                await this.matchLoader.useHability(aiHero.idUser, idHability, victim.idUser);
             }
         } catch (error) { logger.error(`Error al llamar a la API de IA: ${error}`); }
 
