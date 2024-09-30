@@ -27,7 +27,7 @@ import { heroType, subHeroType } from "../types/hero.type.js";
 dotenv.config();
 
 const POWER_PER_TURN: number = parseInt(process.env['POWER_PER_TURN'] || '2');
-const url: string = process.env.API_URL || 'http://127.0.0.1:5000/api/calculate/damage';
+const url: string = process.env.API_URL || 'http://127.0.0.1:5001/api/calculate/damage';
 
 
 export class MatchLoader implements IMatchLoader {
@@ -86,7 +86,7 @@ export class MatchLoader implements IMatchLoader {
       
         const subHeroTranslations: Record<subHeroType, string> = {
           tank: 'TANQUE',
-          weapon: 'ARMA',
+          weapon: 'ARMAS',
           fire: 'FUEGO',
           ice: 'HIELO',
           poison: 'VENENO',
@@ -130,7 +130,7 @@ export class MatchLoader implements IMatchLoader {
                 return;
             }
         }
-
+        this.io.emit("lastAttackName", {perpetratorId: perpetratorId, victimId: victimId});
         await this.affectPlayerHealth(perpetrator, victim);
         this.affectSkills(perpetratorId, product, victimId);
         this.affectPlayerPower(perpetrator, product);
