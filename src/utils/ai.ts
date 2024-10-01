@@ -47,7 +47,8 @@ export class AIUtil {
             randomNpc.subtype as subHeroType,
             attributesArray,
             products,
-            team.teamSide
+            team.teamSide,
+            10
         );
 
         team.addHero(newAiHero);
