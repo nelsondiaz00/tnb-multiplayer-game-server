@@ -1,7 +1,6 @@
-import { IAttribute } from "./attribute.interfaces.js";
-
+import { attributeName } from '../types/attribute.type';
 export interface ICondition {
-    attribute1: IAttribute;
-    attribute2: IAttribute;
-    logicOperator: string;
+  attribute1: attributeName;
+  attribute2: attributeName;
+  logicOperator: string;
 }

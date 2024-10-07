@@ -1,18 +1,18 @@
 // import { Product } from "./product.model";
 import * as math from "mathjs";
-import { Attribute } from "./attribute.model.js";
 import { ICondition } from "../interfaces/condition.interface.js";
+import { attributeName } from "../types/attribute.type.js";
 
 export class Condition implements ICondition {
     //requiredProduct: Product;
-    public attribute1: Attribute;
-    public attribute2: Attribute;
+    public attribute1: attributeName;
+    public attribute2: attributeName;
     public logicOperator: string;
 
     constructor(
         // requiredProduct: Product,
-        attribute1: Attribute,
-        attribute2: Attribute,
+        attribute1: attributeName,
+        attribute2: attributeName,
         logicOperator: string,
     ) {
         //this.requiredProduct = requiredProduct;
